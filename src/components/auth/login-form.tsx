@@ -1,9 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 export function LoginForm() {
+  const searchParams = useSearchParams()
+  const linkExpired = searchParams.get('error') === 'invalid_link'
+
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
@@ -46,6 +50,12 @@ export function LoginForm() {
     <div className="bg-white rounded-lg border border-gray-200 p-6">
       <h2 className="font-semibold text-gray-900 mb-1">Entrar</h2>
       <p className="text-sm text-gray-500 mb-4">Receba um link de acesso no seu e-mail.</p>
+
+      {linkExpired && (
+        <p className="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-md px-3 py-2 mb-4">
+          O link expirou ou já foi usado. Solicite um novo abaixo.
+        </p>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
