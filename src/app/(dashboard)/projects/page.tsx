@@ -1,18 +1,25 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { ProjectsTable } from '@/components/projects/projects-table'
+import { AddProjectDialog } from '@/components/settings/add-project-dialog'
 
 export default async function ProjectsPage() {
   const supabase = createAdminClient()
 
-  const { data: projects } = await supabase
-    .from('projects')
-    .select(`
-      id, name, client_name, status, budget_hours, alert_threshold, created_at,
-      project_phases(name),
-      time_entries(duration_min, is_deleted)
-    `)
-    .eq('is_deleted', false)
-    .order('created_at', { ascending: false })
+  const [{ data: projects }, { data: phases }] = await Promise.all([
+    supabase
+      .from('projects')
+      .select(`
+        id, name, client_name, status, budget_hours, alert_threshold, created_at,
+        project_phases(name),
+        time_entries(duration_min, is_deleted)
+      `)
+      .eq('is_deleted', false)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('project_phases')
+      .select('id, name, display_order')
+      .order('display_order', { ascending: true }),
+  ])
 
   const projectsWithHours = (projects || []).map((p) => {
     const entries = (p.time_entries as { duration_min: number; is_deleted: boolean }[]) || []
@@ -29,6 +36,7 @@ export default async function ProjectsPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900">Projetos</h1>
+        <AddProjectDialog phases={phases || []} />
       </div>
       <ProjectsTable projects={projectsWithHours} />
     </div>
