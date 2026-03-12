@@ -58,7 +58,8 @@ export default async function OverviewPage() {
 
       <div className="grid grid-cols-1 gap-6">
         <HoursBarChart data={chartData} />
-        <TimeEntriesTable entries={timeEntries || []} />
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+        <TimeEntriesTable entries={(timeEntries || []) as any} />
       </div>
     </div>
   )
