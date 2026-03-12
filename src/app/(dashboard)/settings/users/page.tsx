@@ -1,5 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { UsersTable } from '@/components/settings/users-table'
+import { AddUserDialog } from '@/components/settings/add-user-dialog'
 
 export default async function SettingsUsersPage() {
   const supabase = createAdminClient()
@@ -18,6 +19,7 @@ export default async function SettingsUsersPage() {
             Gerencie os membros da equipe e seus perfis de acesso.
           </p>
         </div>
+        <AddUserDialog />
       </div>
 
       <UsersTable users={users || []} />

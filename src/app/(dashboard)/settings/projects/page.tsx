@@ -1,5 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { SettingsProjectsTable } from '@/components/settings/settings-projects-table'
+import { AddProjectDialog } from '@/components/settings/add-project-dialog'
 
 export default async function SettingsProjectsPage() {
   const supabase = createAdminClient()
@@ -31,6 +32,7 @@ export default async function SettingsProjectsPage() {
             Cadastre e edite os projetos da organização.
           </p>
         </div>
+        <AddProjectDialog phases={phases || []} />
       </div>
 
       <SettingsProjectsTable projects={projects || []} phases={phases || []} />
