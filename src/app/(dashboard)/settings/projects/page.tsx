@@ -1,8 +1,8 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { SettingsProjectsTable } from '@/components/settings/settings-projects-table'
 
 export default async function SettingsProjectsPage() {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
 
   const [{ data: projects }, { data: phases }] = await Promise.all([
     supabase

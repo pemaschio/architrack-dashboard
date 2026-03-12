@@ -1,8 +1,8 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { UsersTable } from '@/components/settings/users-table'
 
 export default async function SettingsUsersPage() {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
 
   const { data: users } = await supabase
     .from('users')

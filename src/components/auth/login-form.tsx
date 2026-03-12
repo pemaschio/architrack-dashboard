@@ -1,13 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 export function LoginForm() {
-  const searchParams = useSearchParams()
-  const linkExpired = searchParams.get('error') === 'invalid_link'
-
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
@@ -27,7 +23,7 @@ export function LoginForm() {
     })
 
     if (error) {
-      setError(error.message)
+      setError('Erro ao enviar o link. Tente novamente.')
     } else {
       setSent(true)
     }
@@ -37,11 +33,17 @@ export function LoginForm() {
   if (sent) {
     return (
       <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
-        <div className="text-4xl mb-4">📧</div>
-        <h2 className="font-semibold text-gray-900 mb-2">Link enviado!</h2>
-        <p className="text-gray-500 text-sm">
-          Verifique seu e-mail <strong>{email}</strong> e clique no link para acessar o dashboard.
+        <div className="text-4xl mb-3">📬</div>
+        <h2 className="font-semibold text-gray-900 mb-1">Link enviado!</h2>
+        <p className="text-sm text-gray-500">
+          Verifique seu e-mail <strong>{email}</strong> e clique no link para entrar.
         </p>
+        <button
+          onClick={() => { setSent(false); setEmail('') }}
+          className="mt-4 text-sm text-blue-600 hover:underline"
+        >
+          Usar outro e-mail
+        </button>
       </div>
     )
   }
@@ -49,13 +51,7 @@ export function LoginForm() {
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6">
       <h2 className="font-semibold text-gray-900 mb-1">Entrar</h2>
-      <p className="text-sm text-gray-500 mb-4">Receba um link de acesso no seu e-mail.</p>
-
-      {linkExpired && (
-        <p className="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-md px-3 py-2 mb-4">
-          O link expirou ou já foi usado. Solicite um novo abaixo.
-        </p>
-      )}
+      <p className="text-sm text-gray-500 mb-4">Informe seu e-mail para receber o link de acesso.</p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -73,9 +69,7 @@ export function LoginForm() {
           />
         </div>
 
-        {error && (
-          <p className="text-sm text-red-600">{error}</p>
-        )}
+        {error && <p className="text-sm text-red-600">{error}</p>}
 
         <button
           type="submit"

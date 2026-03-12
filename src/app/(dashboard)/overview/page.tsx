@@ -1,10 +1,10 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { KpiCards } from '@/components/overview/kpi-cards'
 import { TimeEntriesTable } from '@/components/overview/time-entries-table'
 import { HoursBarChart } from '@/components/overview/hours-bar-chart'
 
 export default async function OverviewPage() {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
 
   const weekStart = new Date()
   weekStart.setDate(weekStart.getDate() - 7)
@@ -37,7 +37,7 @@ export default async function OverviewPage() {
 
   const hoursByProject: Record<string, number> = {}
   for (const entry of timeEntries || []) {
-    const name = (entry.projects as { name: string } | null)?.name ?? 'Sem projeto'
+    const name = (entry.projects as unknown as { name: string } | null)?.name ?? 'Sem projeto'
     hoursByProject[name] = (hoursByProject[name] || 0) + (entry.duration_min || 0) / 60
   }
 
