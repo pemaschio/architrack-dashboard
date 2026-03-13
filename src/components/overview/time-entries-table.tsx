@@ -5,6 +5,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import Link from 'next/link'
 import { ChevronDown, ChevronRight, X, ExternalLink } from 'lucide-react'
+import { projectColor } from '@/lib/project-colors'
 
 interface TimeEntry {
   id: string
@@ -32,14 +33,28 @@ function formatDuration(minutes: number | null) {
 
 const sourceLabels: Record<string, string> = {
   whatsapp_direct: 'WhatsApp',
-  whatsapp_timer: 'Timer',
-  dashboard: 'Dashboard',
+  whatsapp_timer:  'Timer',
+  dashboard:       'Dashboard',
 }
 
-const sourceBadgeColors: Record<string, string> = {
-  whatsapp_direct: 'bg-green-50 text-green-700',
-  whatsapp_timer: 'bg-blue-50 text-blue-700',
-  dashboard: 'bg-gray-100 text-gray-700',
+const sourceDots: Record<string, string> = {
+  whatsapp_direct: '#16A34A',
+  whatsapp_timer:  '#0066CC',
+  dashboard:       'rgba(10,10,11,0.28)',
+}
+
+const TH_STYLE: React.CSSProperties = {
+  fontSize: 10,
+  fontWeight: 500,
+  letterSpacing: '0.07em',
+  textTransform: 'uppercase',
+  color: 'rgba(10,10,11,0.38)',
+  textAlign: 'left',
+  paddingTop: 10,
+  paddingBottom: 10,
+  paddingLeft: 16,
+  paddingRight: 16,
+  whiteSpace: 'nowrap',
 }
 
 export function TimeEntriesTable({ entries, filterProject, onClearFilter }: Props) {
@@ -53,94 +68,231 @@ export function TimeEntriesTable({ entries, filterProject, onClearFilter }: Prop
   const hasMore = filtered.length > 20
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200">
-      <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <h2 className="text-sm font-medium text-gray-700">Registros recentes</h2>
+    <div
+      style={{
+        background: '#ffffff',
+        borderRadius: 8,
+        boxShadow: '0 1px 2px rgba(0,0,0,0.06), 0 0 0 0.5px rgba(0,0,0,0.05)',
+        overflow: 'hidden',
+      }}
+    >
+      {/* Section header */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '12px 20px',
+          borderBottom: '1px solid rgba(10,10,11,0.06)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 13, fontWeight: 500, color: '#0A0A0B' }}>
+            Registros recentes
+          </span>
+
           {filterProject && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                fontSize: 11,
+                fontWeight: 500,
+                background: 'rgba(10,10,11,0.06)',
+                color: '#0A0A0B',
+                borderRadius: 4,
+                padding: '2px 8px 2px 6px',
+              }}
+            >
+              <span
+                style={{
+                  width: 5,
+                  height: 5,
+                  borderRadius: '50%',
+                  background: projectColor(filterProject),
+                  display: 'inline-block',
+                }}
+              />
               {filterProject}
               {onClearFilter && (
                 <button
                   onClick={onClearFilter}
-                  className="ml-0.5 hover:text-blue-900 transition-colors"
+                  style={{
+                    marginLeft: 2,
+                    opacity: 0.45,
+                    display: 'flex',
+                    border: 'none',
+                    background: 'none',
+                    cursor: 'pointer',
+                    padding: 0,
+                  }}
                   aria-label="Remover filtro"
                 >
-                  <X className="w-3 h-3" />
+                  <X style={{ width: 10, height: 10 }} />
                 </button>
               )}
             </span>
           )}
         </div>
-        <span className="text-xs text-gray-400">
+
+        <span style={{ fontSize: 11, color: 'rgba(10,10,11,0.32)' }}>
           {filtered.length} registro{filtered.length !== 1 ? 's' : ''}
         </span>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+      {/* Table */}
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr className="border-b border-gray-100 bg-gray-50/50">
-              <th className="w-8 px-3 py-3" />
-              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">
-                Arquiteto
-              </th>
-              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">
-                Projeto
-              </th>
-              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">
-                Atividade
-              </th>
-              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">
-                Duração
-              </th>
-              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">
-                Origem
-              </th>
-              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">
-                Quando
-              </th>
+            <tr style={{ borderBottom: '1px solid rgba(10,10,11,0.05)' }}>
+              <th style={{ ...TH_STYLE, width: 24, padding: '10px 8px 10px 20px' }} />
+              <th style={TH_STYLE}>Arquiteto</th>
+              <th style={TH_STYLE}>Projeto</th>
+              <th style={TH_STYLE}>Atividade</th>
+              <th style={TH_STYLE}>Duração</th>
+              <th style={TH_STYLE}>Origem</th>
+              <th style={TH_STYLE}>Quando</th>
             </tr>
           </thead>
           <tbody>
-            {displayed.map((entry) => {
+            {displayed.map((entry, idx) => {
               const isExpanded = expandedId === entry.id
               const hasDescription = !!entry.description
+              const isLast = idx === displayed.length - 1
+              const projName = entry.projects?.name ?? ''
 
               return (
                 <>
                   <tr
                     key={entry.id}
-                    className={`border-b border-gray-50 transition-colors ${hasDescription ? 'cursor-pointer hover:bg-gray-50' : 'hover:bg-gray-50'} ${isExpanded ? 'bg-blue-50/30' : ''}`}
-                    onClick={() => hasDescription && setExpandedId(isExpanded ? null : entry.id)}
+                    style={{
+                      borderBottom:
+                        isLast && !isExpanded ? 'none' : '1px solid rgba(10,10,11,0.04)',
+                      background: isExpanded ? 'rgba(10,10,11,0.02)' : 'transparent',
+                      cursor: hasDescription ? 'pointer' : 'default',
+                      transition: 'background 0.1s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isExpanded)
+                        (e.currentTarget as HTMLTableRowElement).style.background =
+                          'rgba(10,10,11,0.02)'
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isExpanded)
+                        (e.currentTarget as HTMLTableRowElement).style.background = 'transparent'
+                    }}
+                    onClick={() =>
+                      hasDescription && setExpandedId(isExpanded ? null : entry.id)
+                    }
                   >
-                    <td className="px-3 py-3 text-gray-300">
+                    {/* Chevron */}
+                    <td style={{ padding: '11px 8px 11px 20px', width: 24 }}>
                       {hasDescription ? (
                         isExpanded ? (
-                          <ChevronDown className="w-3.5 h-3.5 text-blue-500" />
+                          <ChevronDown
+                            style={{ width: 11, height: 11, color: '#0066CC', opacity: 0.85 }}
+                          />
                         ) : (
-                          <ChevronRight className="w-3.5 h-3.5" />
+                          <ChevronRight
+                            style={{ width: 11, height: 11, color: 'rgba(10,10,11,0.22)' }}
+                          />
                         )
                       ) : null}
                     </td>
-                    <td className="px-4 py-3 font-medium text-gray-900">
+
+                    {/* Architect */}
+                    <td
+                      style={{
+                        padding: '11px 16px',
+                        fontSize: 13,
+                        fontWeight: 500,
+                        color: '#0A0A0B',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
                       {entry.users?.name ?? '—'}
                     </td>
-                    <td className="px-4 py-3 text-gray-600">
-                      {entry.projects?.name ?? '—'}
+
+                    {/* Project with identity dot */}
+                    <td style={{ padding: '11px 16px', whiteSpace: 'nowrap' }}>
+                      {projName ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <div
+                            style={{
+                              width: 5,
+                              height: 5,
+                              borderRadius: '50%',
+                              background: projectColor(projName),
+                              flexShrink: 0,
+                            }}
+                          />
+                          <span style={{ fontSize: 13, color: 'rgba(10,10,11,0.62)' }}>
+                            {projName}
+                          </span>
+                        </div>
+                      ) : (
+                        <span style={{ fontSize: 13, color: 'rgba(10,10,11,0.24)' }}>—</span>
+                      )}
                     </td>
-                    <td className="px-4 py-3 text-gray-600">
+
+                    {/* Activity */}
+                    <td
+                      style={{
+                        padding: '11px 16px',
+                        fontSize: 13,
+                        color: 'rgba(10,10,11,0.48)',
+                      }}
+                    >
                       {entry.activity_types?.name ?? '—'}
                     </td>
-                    <td className="px-4 py-3 font-medium text-gray-900 tabular-nums">
+
+                    {/* Duration */}
+                    <td
+                      style={{
+                        padding: '11px 16px',
+                        fontSize: 13,
+                        color: '#0A0A0B',
+                        fontVariantNumeric: 'tabular-nums',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
                       {formatDuration(entry.duration_min)}
                     </td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${sourceBadgeColors[entry.source] ?? 'bg-gray-100 text-gray-700'}`}>
-                        {sourceLabels[entry.source] ?? entry.source}
-                      </span>
+
+                    {/* Source */}
+                    <td style={{ padding: '11px 16px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                        <div
+                          style={{
+                            width: 4,
+                            height: 4,
+                            borderRadius: '50%',
+                            background: sourceDots[entry.source] ?? 'rgba(10,10,11,0.24)',
+                            flexShrink: 0,
+                          }}
+                        />
+                        <span
+                          style={{
+                            fontSize: 12,
+                            color: 'rgba(10,10,11,0.42)',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {sourceLabels[entry.source] ?? entry.source}
+                        </span>
+                      </div>
                     </td>
-                    <td className="px-4 py-3 text-gray-400 text-xs whitespace-nowrap">
+
+                    {/* When */}
+                    <td
+                      style={{
+                        padding: '11px 16px',
+                        fontSize: 11,
+                        color: 'rgba(10,10,11,0.28)',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
                       {formatDistanceToNow(new Date(entry.started_at), {
                         addSuffix: true,
                         locale: ptBR,
@@ -149,9 +301,23 @@ export function TimeEntriesTable({ entries, filterProject, onClearFilter }: Prop
                   </tr>
 
                   {isExpanded && entry.description && (
-                    <tr key={`${entry.id}-desc`} className="bg-blue-50/20 border-b border-gray-50">
-                      <td colSpan={7} className="px-6 py-3">
-                        <p className="text-xs text-gray-600 italic">
+                    <tr
+                      key={`${entry.id}-desc`}
+                      style={{
+                        borderBottom: '1px solid rgba(10,10,11,0.04)',
+                        background: 'rgba(10,10,11,0.015)',
+                      }}
+                    >
+                      <td colSpan={7} style={{ padding: '8px 20px 12px 48px' }}>
+                        <p
+                          style={{
+                            fontSize: 12,
+                            color: 'rgba(10,10,11,0.48)',
+                            fontStyle: 'italic',
+                            lineHeight: 1.6,
+                            margin: 0,
+                          }}
+                        >
                           &ldquo;{entry.description}&rdquo;
                         </p>
                       </td>
@@ -163,7 +329,15 @@ export function TimeEntriesTable({ entries, filterProject, onClearFilter }: Prop
 
             {displayed.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-5 py-10 text-center text-gray-400 text-sm">
+                <td
+                  colSpan={7}
+                  style={{
+                    padding: '48px 20px',
+                    textAlign: 'center',
+                    fontSize: 13,
+                    color: 'rgba(10,10,11,0.28)',
+                  }}
+                >
                   {filterProject
                     ? `Nenhum registro para "${filterProject}" nos últimos 7 dias.`
                     : 'Nenhum registro nos últimos 7 dias.'}
@@ -174,19 +348,38 @@ export function TimeEntriesTable({ entries, filterProject, onClearFilter }: Prop
         </table>
       </div>
 
+      {/* Footer */}
       {(hasMore || displayed.length > 0) && (
-        <div className="px-5 py-3 border-t border-gray-100 flex items-center justify-between">
-          {hasMore && (
-            <span className="text-xs text-gray-400">
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '10px 20px',
+            borderTop: '1px solid rgba(10,10,11,0.05)',
+          }}
+        >
+          {hasMore ? (
+            <span style={{ fontSize: 11, color: 'rgba(10,10,11,0.30)' }}>
               Mostrando 20 de {filtered.length} registros
             </span>
+          ) : (
+            <span />
           )}
           <Link
             href="/projects"
-            className="ml-auto flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800 transition-colors"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              fontSize: 12,
+              fontWeight: 500,
+              color: '#0066CC',
+              textDecoration: 'none',
+            }}
           >
             Ver projetos completos
-            <ExternalLink className="w-3 h-3" />
+            <ExternalLink style={{ width: 11, height: 11 }} />
           </Link>
         </div>
       )}

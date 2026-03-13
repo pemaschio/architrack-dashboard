@@ -2,7 +2,11 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+  variable: '--font-inter',
+})
 
 export const metadata: Metadata = {
   title: 'ArchiTrack — Gestão para escritórios de arquitetura',
@@ -15,8 +19,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="pt-BR">
-      <body className={inter.className}>{children}</body>
+    <html lang="pt-BR" className={inter.variable}>
+      <body style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
+        {children}
+      </body>
     </html>
   )
 }

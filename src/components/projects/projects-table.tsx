@@ -3,14 +3,15 @@
 import { useState, useTransition, useCallback } from 'react'
 import { fetchProjectDetail, type ProjectDetail } from '@/app/actions/details'
 import { ProjectDetailPanel } from '@/components/shared/project-detail-panel'
+import { projectColor } from '@/lib/project-colors'
 
 type ProjectStatus = 'active' | 'paused' | 'completed' | 'cancelled'
 
-const statusConfig: Record<ProjectStatus, { label: string; className: string }> = {
-  active:    { label: 'Ativo',     className: 'bg-green-100 text-green-700' },
-  paused:    { label: 'Pausado',   className: 'bg-yellow-100 text-yellow-700' },
-  completed: { label: 'Concluído', className: 'bg-blue-100 text-blue-700' },
-  cancelled: { label: 'Cancelado', className: 'bg-red-100 text-red-700' },
+const statusConfig: Record<ProjectStatus, { label: string; dot: string }> = {
+  active:    { label: 'Ativo',     dot: '#16A34A' },
+  paused:    { label: 'Pausado',   dot: '#D97706' },
+  completed: { label: 'Concluído', dot: '#2563EB' },
+  cancelled: { label: 'Cancelado', dot: '#DC2626' },
 }
 
 interface Project {
@@ -27,6 +28,20 @@ interface Project {
 
 interface Props {
   projects: Project[]
+}
+
+const TH_STYLE: React.CSSProperties = {
+  fontSize: 10,
+  fontWeight: 500,
+  letterSpacing: '0.07em',
+  textTransform: 'uppercase',
+  color: 'rgba(10,10,11,0.38)',
+  textAlign: 'left',
+  paddingTop: 10,
+  paddingBottom: 10,
+  paddingLeft: 20,
+  paddingRight: 20,
+  whiteSpace: 'nowrap',
 }
 
 export function ProjectsTable({ projects }: Props) {
@@ -47,71 +62,206 @@ export function ProjectsTable({ projects }: Props) {
 
   return (
     <>
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+      <div
+        style={{
+          background: '#ffffff',
+          borderRadius: 8,
+          boxShadow: '0 1px 2px rgba(0,0,0,0.06), 0 0 0 0.5px rgba(0,0,0,0.05)',
+          overflow: 'hidden',
+        }}
+      >
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr className="border-b border-gray-100">
-                {['Projeto', 'Cliente', 'Etapa', 'Status', 'Horas realizadas', 'Orçado', '%'].map(
-                  (h) => (
-                    <th
-                      key={h}
-                      className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide"
-                    >
-                      {h}
-                    </th>
-                  )
-                )}
+              <tr style={{ borderBottom: '1px solid rgba(10,10,11,0.06)' }}>
+                <th style={{ ...TH_STYLE, width: 32, paddingRight: 0 }} />
+                <th style={TH_STYLE}>Projeto</th>
+                <th style={TH_STYLE}>Cliente</th>
+                <th style={TH_STYLE}>Etapa</th>
+                <th style={TH_STYLE}>Status</th>
+                <th style={TH_STYLE}>Horas</th>
+                <th style={TH_STYLE}>Orçado</th>
+                <th style={TH_STYLE}>Uso</th>
               </tr>
             </thead>
             <tbody>
-              {projects.map((project) => {
+              {projects.map((project, idx) => {
                 const s = statusConfig[project.status] ?? statusConfig.active
                 const isOverAlert =
                   project.percentage !== null &&
                   project.percentage >= project.alert_threshold
+                const dot = projectColor(project.name)
+                const isLast = idx === projects.length - 1
 
                 return (
                   <tr
                     key={project.id}
                     onClick={() => handleRowClick(project.id)}
-                    className="border-b border-gray-50 hover:bg-gray-50 cursor-pointer transition-colors"
+                    style={{
+                      borderBottom: isLast ? 'none' : '1px solid rgba(10,10,11,0.04)',
+                      cursor: 'pointer',
+                      transition: 'background 0.1s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      ;(e.currentTarget as HTMLTableRowElement).style.background =
+                        'rgba(10,10,11,0.025)'
+                    }}
+                    onMouseLeave={(e) => {
+                      ;(e.currentTarget as HTMLTableRowElement).style.background = 'transparent'
+                    }}
                   >
-                    <td className="px-5 py-3 font-medium text-gray-900">{project.name}</td>
-                    <td className="px-5 py-3 text-gray-500">{project.client_name || '—'}</td>
-                    <td className="px-5 py-3 text-gray-500">
+                    {/* Project identity dot */}
+                    <td style={{ padding: '11px 0 11px 20px', width: 32 }}>
+                      <div
+                        style={{
+                          width: 7,
+                          height: 7,
+                          borderRadius: '50%',
+                          background: dot,
+                          flexShrink: 0,
+                        }}
+                      />
+                    </td>
+
+                    {/* Name */}
+                    <td
+                      style={{
+                        padding: '11px 20px',
+                        fontSize: 13,
+                        fontWeight: 500,
+                        color: '#0A0A0B',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {project.name}
+                    </td>
+
+                    {/* Client */}
+                    <td
+                      style={{
+                        padding: '11px 20px',
+                        fontSize: 13,
+                        color: 'rgba(10,10,11,0.48)',
+                      }}
+                    >
+                      {project.client_name || '—'}
+                    </td>
+
+                    {/* Phase */}
+                    <td
+                      style={{
+                        padding: '11px 20px',
+                        fontSize: 13,
+                        color: 'rgba(10,10,11,0.48)',
+                      }}
+                    >
                       {project.project_phases?.name || '—'}
                     </td>
-                    <td className="px-5 py-3">
-                      <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${s.className}`}
-                      >
-                        {s.label}
-                      </span>
+
+                    {/* Status */}
+                    <td style={{ padding: '11px 20px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <div
+                          style={{
+                            width: 5,
+                            height: 5,
+                            borderRadius: '50%',
+                            background: s.dot,
+                            flexShrink: 0,
+                          }}
+                        />
+                        <span
+                          style={{
+                            fontSize: 12,
+                            color: 'rgba(10,10,11,0.52)',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {s.label}
+                        </span>
+                      </div>
                     </td>
-                    <td className="px-5 py-3 text-gray-900">{project.total_hours}h</td>
-                    <td className="px-5 py-3 text-gray-500">
+
+                    {/* Hours */}
+                    <td
+                      style={{
+                        padding: '11px 20px',
+                        fontSize: 13,
+                        color: '#0A0A0B',
+                        fontVariantNumeric: 'tabular-nums',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {project.total_hours}h
+                    </td>
+
+                    {/* Budget */}
+                    <td
+                      style={{
+                        padding: '11px 20px',
+                        fontSize: 13,
+                        color: 'rgba(10,10,11,0.38)',
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    >
                       {project.budget_hours ? `${project.budget_hours}h` : '—'}
                     </td>
-                    <td className="px-5 py-3">
+
+                    {/* Usage: 3px progress bar + % */}
+                    <td style={{ padding: '11px 20px', minWidth: 110 }}>
                       {project.percentage !== null ? (
-                        <span
-                          className={
-                            isOverAlert ? 'text-amber-600 font-semibold' : 'text-gray-700'
-                          }
-                        >
-                          {project.percentage}%{isOverAlert && ' ⚠️'}
-                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          {/* 3px bar */}
+                          <div
+                            style={{
+                              width: 60,
+                              height: 3,
+                              borderRadius: 2,
+                              background: 'rgba(10,10,11,0.08)',
+                              overflow: 'hidden',
+                              flexShrink: 0,
+                            }}
+                          >
+                            <div
+                              style={{
+                                height: '100%',
+                                width: `${Math.min(project.percentage, 100)}%`,
+                                borderRadius: 2,
+                                background: isOverAlert ? '#DC2626' : dot,
+                              }}
+                            />
+                          </div>
+                          <span
+                            style={{
+                              fontSize: 12,
+                              fontVariantNumeric: 'tabular-nums',
+                              fontWeight: isOverAlert ? 500 : 400,
+                              color: isOverAlert ? '#DC2626' : 'rgba(10,10,11,0.48)',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {project.percentage}%
+                          </span>
+                        </div>
                       ) : (
-                        '—'
+                        <span style={{ color: 'rgba(10,10,11,0.22)', fontSize: 13 }}>—</span>
                       )}
                     </td>
                   </tr>
                 )
               })}
+
               {projects.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-5 py-10 text-center text-gray-400 text-sm">
+                  <td
+                    colSpan={8}
+                    style={{
+                      padding: '48px 20px',
+                      textAlign: 'center',
+                      fontSize: 13,
+                      color: 'rgba(10,10,11,0.28)',
+                    }}
+                  >
                     Nenhum projeto encontrado.
                   </td>
                 </tr>

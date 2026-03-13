@@ -4,34 +4,83 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* shadcn tokens — tuned for ArchiTrack palette */
+    --background: 240 5% 96.5%;
+    --foreground: 0 0% 4%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 0 0% 4%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
+    --popover-foreground: 0 0% 4%;
+    --primary: 211 100% 40%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 4% 95%;
+    --secondary-foreground: 0 0% 20%;
+    --muted: 240 4% 95%;
+    --muted-foreground: 0 0% 44%;
+    --accent: 240 4% 95%;
+    --accent-foreground: 0 0% 20%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 5% 89%;
+    --input: 240 5% 89%;
+    --ring: 211 100% 40%;
+    --radius: 0.375rem;
   }
 }
 
 @layer base {
   * {
     @apply border-border;
+    box-sizing: border-box;
   }
+
   body {
-    @apply bg-background text-foreground;
+    background-color: #F6F6F7;
+    color: #0A0A0B;
+    font-feature-settings: 'cv11', 'ss01';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Remove table-specific border defaults */
+  table {
+    border-collapse: collapse;
+  }
+}
+
+@layer utilities {
+  /* KPI number treatment — Apple iOS elegance */
+  .kpi-num {
+    font-weight: 300;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Surface card — macOS card style */
+  .card-surface {
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 0 0 0.5px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+  }
+
+  /* Ink scale */
+  .ink     { color: #0A0A0B; }
+  .ink-60  { color: rgba(10, 10, 11, 0.60); }
+  .ink-40  { color: rgba(10, 10, 11, 0.40); }
+  .ink-24  { color: rgba(10, 10, 11, 0.24); }
+
+  /* System accent — sparingly */
+  .text-sys-blue { color: #0066CC; }
+  .bg-sys-blue-subtle { background-color: rgba(0, 102, 204, 0.07); }
+
+  /* Table rows */
+  .row-hover:hover {
+    background-color: rgba(10, 10, 11, 0.025);
+  }
+
+  /* Sidebar nav item active */
+  .nav-active {
+    background-color: rgba(10, 10, 11, 0.06);
   }
 }

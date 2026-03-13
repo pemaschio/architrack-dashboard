@@ -33,9 +33,19 @@ export default async function ProjectsPage() {
   })
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Projetos</h1>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <h1
+          style={{
+            fontSize: 20,
+            fontWeight: 500,
+            letterSpacing: '-0.02em',
+            color: '#0A0A0B',
+            margin: 0,
+          }}
+        >
+          Projetos
+        </h1>
         <AddProjectDialog phases={phases || []} />
       </div>
       <ProjectsTable projects={projectsWithHours} />

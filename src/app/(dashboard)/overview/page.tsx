@@ -46,10 +46,22 @@ export default async function OverviewPage() {
     .slice(0, 10)
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Painel</h1>
-        <span className="text-xs text-gray-400">Últimos 7 dias</span>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+        <h1
+          style={{
+            fontSize: 20,
+            fontWeight: 500,
+            letterSpacing: '-0.02em',
+            color: '#0A0A0B',
+            margin: 0,
+          }}
+        >
+          Painel
+        </h1>
+        <span style={{ fontSize: 11, color: 'rgba(10,10,11,0.36)', fontWeight: 400 }}>
+          Últimos 7 dias
+        </span>
       </div>
 
       <KpiCards
