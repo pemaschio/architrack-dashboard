@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import Link from 'next/link'
@@ -163,9 +163,8 @@ export function TimeEntriesTable({ entries, filterProject, onClearFilter }: Prop
               const projName = entry.projects?.name ?? ''
 
               return (
-                <>
+                <Fragment key={entry.id}>
                   <tr
-                    key={entry.id}
                     style={{
                       borderBottom:
                         isLast && !isExpanded ? 'none' : '1px solid rgba(10,10,11,0.04)',
@@ -302,7 +301,6 @@ export function TimeEntriesTable({ entries, filterProject, onClearFilter }: Prop
 
                   {isExpanded && entry.description && (
                     <tr
-                      key={`${entry.id}-desc`}
                       style={{
                         borderBottom: '1px solid rgba(10,10,11,0.04)',
                         background: 'rgba(10,10,11,0.015)',
@@ -323,7 +321,7 @@ export function TimeEntriesTable({ entries, filterProject, onClearFilter }: Prop
                       </td>
                     </tr>
                   )}
-                </>
+                </Fragment>
               )
             })}
 
