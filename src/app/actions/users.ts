@@ -3,6 +3,8 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
 
+const ORG_ID = '00000000-0000-0000-0000-000000000001'
+
 export async function createUser(formData: FormData) {
   const name = formData.get('name') as string
   const phone = formData.get('phone') as string
@@ -16,6 +18,7 @@ export async function createUser(formData: FormData) {
   const supabase = createAdminClient()
 
   const { error } = await supabase.from('users').insert({
+    org_id: ORG_ID,
     name: name.trim(),
     phone: phone.trim().replace(/\D/g, ''),
     role,

@@ -22,7 +22,8 @@ export default async function ProjectsPage() {
   ])
 
   const projectsWithHours = (projects || []).map((p) => {
-    const entries = (p.time_entries as { duration_min: number; is_deleted: boolean }[]) || []
+    const raw = p.time_entries
+    const entries: { duration_min: number; is_deleted: boolean }[] = Array.isArray(raw) ? raw : []
     const validEntries = entries.filter((e) => !e.is_deleted)
     const totalMin = validEntries.reduce((sum, e) => sum + (e.duration_min || 0), 0)
     const totalHours = Math.round((totalMin / 60) * 10) / 10

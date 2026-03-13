@@ -3,11 +3,15 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
 
-export async function createProject(formData: FormData) {
+const ORG_ID = '00000000-0000-0000-0000-000000000001'
+
+export async function createProject(
+  formData: FormData,
+): Promise<{ error: string | null }> {
   const name = formData.get('name') as string
 
   if (!name) {
-    throw new Error('Nome do projeto é obrigatório.')
+    return { error: 'Nome do projeto é obrigatório.' }
   }
 
   const budgetHoursRaw = formData.get('budget_hours') as string
@@ -17,23 +21,31 @@ export async function createProject(formData: FormData) {
   const startDate = formData.get('start_date') as string
   const deadline = formData.get('deadline') as string
 
-  const supabase = createAdminClient()
+  try {
+    const supabase = createAdminClient()
 
-  const { error } = await supabase.from('projects').insert({
-    name: name.trim(),
-    client_name: (formData.get('client_name') as string)?.trim() || null,
-    status: (formData.get('status') as string) || 'active',
-    budget_hours: budgetHoursRaw ? parseFloat(budgetHoursRaw) : null,
-    budget_value: budgetValueRaw ? parseFloat(budgetValueRaw) : null,
-    alert_threshold: alertThresholdRaw ? parseInt(alertThresholdRaw) : 80,
-    phase_id: phaseId || null,
-    start_date: startDate || null,
-    deadline: deadline || null,
-    is_deleted: false,
-  })
+    const { error } = await supabase.from('projects').insert({
+      org_id: ORG_ID,
+      name: name.trim(),
+      client_name: (formData.get('client_name') as string)?.trim() || null,
+      status: (formData.get('status') as string) || 'active',
+      budget_hours: budgetHoursRaw ? parseInt(budgetHoursRaw, 10) : null,
+      budget_value: budgetValueRaw ? parseFloat(budgetValueRaw) : null,
+      alert_threshold: alertThresholdRaw ? parseInt(alertThresholdRaw) : 80,
+      phase_id: phaseId || null,
+      start_date: startDate || null,
+      deadline: deadline || null,
+      is_deleted: false,
+    })
 
-  if (error) throw new Error(error.message)
+    if (error) {
+      return { error: error.message }
+    }
 
-  revalidatePath('/settings/projects')
-  revalidatePath('/projects')
+    revalidatePath('/settings/projects')
+    revalidatePath('/projects')
+    return { error: null }
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Erro inesperado ao salvar projeto.' }
+  }
 }

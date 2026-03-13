@@ -24,12 +24,12 @@ export function AddProjectDialog({ phases }: Props) {
     setError(null)
     const formData = new FormData(e.currentTarget)
     startTransition(async () => {
-      try {
-        await createProject(formData)
+      const result = await createProject(formData)
+      if (result.error) {
+        setError(result.error)
+      } else {
         setOpen(false)
         formRef.current?.reset()
-      } catch (err) {
-        setError((err as Error).message)
       }
     })
   }
@@ -117,7 +117,7 @@ export function AddProjectDialog({ phases }: Props) {
                   <input
                     name="budget_hours"
                     type="number"
-                    step="0.5"
+                    step="1"
                     min="0"
                     placeholder="120"
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"

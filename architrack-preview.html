@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ArchiTrack — Design Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* Shell */
+  body { font-family: system-ui, sans-serif; background: #111; color: #e5e5e5; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+  .shell-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 20px; border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 12px; color: rgba(255,255,255,0.4); flex-shrink: 0;
+  }
+  .shell-header strong { color: rgba(255,255,255,0.85); font-size: 13px; }
+
+  .shell-body { display: flex; flex: 1; overflow: hidden; }
+
+  /* Controls */
+  .controls {
+    width: 232px; flex-shrink: 0; border-right: 1px solid rgba(255,255,255,0.08);
+    overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 18px;
+  }
+  .ctrl-group > .ctrl-label {
+    display: block; font-size: 10px; font-weight: 500; letter-spacing: 0.07em;
+    text-transform: uppercase; color: rgba(255,255,255,0.32); margin-bottom: 8px;
+  }
+  .ctrl-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+  .ctrl-row .ctrl-name { font-size: 11px; color: rgba(255,255,255,0.52); }
+  .ctrl-row .ctrl-val { font-size: 10px; color: rgba(255,255,255,0.32); min-width: 38px; text-align: right; font-variant-numeric: tabular-nums; }
+  input[type=range] {
+    -webkit-appearance: none; height: 3px; background: rgba(255,255,255,0.14);
+    border-radius: 2px; outline: none; cursor: pointer; width: 100%; margin-bottom: 8px;
+  }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #fff; cursor: pointer; }
+
+  .tab-row { display: flex; gap: 4px; }
+  .tab-btn {
+    flex: 1; padding: 5px 0; border: 1px solid rgba(255,255,255,0.12); border-radius: 4px;
+    background: transparent; color: rgba(255,255,255,0.42); font-size: 11px; cursor: pointer;
+    font-family: system-ui; transition: all 0.1s;
+  }
+  .tab-btn.active { background: rgba(255,255,255,0.12); color: #fff; border-color: transparent; }
+
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .toggle-row .ctrl-name { font-size: 11px; color: rgba(255,255,255,0.52); }
+  .toggle { position: relative; width: 28px; height: 16px; cursor: pointer; display: inline-block; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-track { position: absolute; inset: 0; background: rgba(255,255,255,0.15); border-radius: 8px; transition: background 0.2s; }
+  .toggle input:checked + .toggle-track { background: #0066CC; }
+  .toggle-thumb { position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: #fff; transition: left 0.2s; pointer-events: none; }
+  .toggle input:checked ~ .toggle-thumb { left: 14px; }
+
+  /* Preview */
+  .preview-wrap { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  #preview-frame { flex: 1; overflow: auto; }
+
+  /* Prompt */
+  .prompt-wrap {
+    border-top: 1px solid rgba(255,255,255,0.08); padding: 12px 18px;
+    display: flex; align-items: flex-start; gap: 10px; background: #0d0d0d; flex-shrink: 0;
+  }
+  #prompt-out { flex: 1; font-size: 11px; line-height: 1.6; color: rgba(255,255,255,0.58); font-family: 'Menlo','Consolas',monospace; }
+  .copy-btn {
+    flex-shrink: 0; padding: 4px 10px; border: 1px solid rgba(255,255,255,0.14); border-radius: 4px;
+    background: transparent; color: rgba(255,255,255,0.5); font-size: 11px; cursor: pointer;
+    font-family: system-ui; transition: all 0.1s;
+  }
+  .copy-btn:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
+  .copy-btn.copied { border-color: #16A34A; color: #16A34A; }
+
+  /* ── ArchiTrack UI ── */
+  .at { font-family: 'Inter', system-ui; -webkit-font-smoothing: antialiased; display: flex; height: 100%; min-height: 600px; }
+
+  /* Sidebar */
+  #at-sidebar { display: flex; flex-direction: column; background: rgba(246,246,247,0.92); border-right: 1px solid rgba(10,10,11,0.08); flex-shrink: 0; }
+  #at-logo { display: flex; align-items: center; padding: 0 16px; border-bottom: 1px solid rgba(10,10,11,0.06); flex-shrink: 0; }
+  .at-logo-name { font-size: 13px; font-weight: 600; letter-spacing: -0.025em; color: #0A0A0B; }
+  .at-logo-sub { font-size: 9.5px; font-weight: 500; letter-spacing: 0.06em; color: rgba(10,10,11,0.32); margin-top: 3px; text-transform: uppercase; }
+  #at-nav { flex: 1; }
+  .at-nav-item {
+    display: flex; align-items: center; gap: 9px; height: 32px;
+    border-radius: 5px; font-size: 13px; cursor: pointer;
+    transition: background 0.1s ease, color 0.1s ease; margin-bottom: 1px;
+    text-decoration: none; color: rgba(10,10,11,0.52); font-weight: 400;
+  }
+  .at-nav-item.active { background: rgba(10,10,11,0.06); font-weight: 500; color: #0A0A0B; }
+  .at-nav-item:not(.active):hover { background: rgba(10,10,11,0.035); color: #0A0A0B; }
+  .nav-icon { flex-shrink: 0; }
+  .at-nav-item.active .nav-icon { opacity: 0.85; }
+  .at-nav-item:not(.active) .nav-icon { opacity: 0.45; }
+  #at-sidebar-footer { border-top: 1px solid rgba(10,10,11,0.06); }
+  .at-signout { display: flex; align-items: center; gap: 9px; height: 32px; border-radius: 5px; font-size: 13px; color: rgba(10,10,11,0.40); cursor: pointer; border: none; background: none; font-family: inherit; width: 100%; }
+  .at-signout:hover { background: rgba(10,10,11,0.035); color: #0A0A0B; }
+
+  /* Main */
+  #at-main { flex: 1; overflow: auto; background: #F6F6F7; display: flex; flex-direction: column; gap: 20px; }
+  .at-page-header { display: flex; align-items: baseline; justify-content: space-between; }
+  .at-page-title { font-size: 20px; font-weight: 500; letter-spacing: -0.02em; color: #0A0A0B; }
+  .at-page-meta { font-size: 11px; color: rgba(10,10,11,0.36); }
+
+  /* KPIs */
+  .at-kpi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+  .at-kpi-card { background: #fff; }
+  .at-kpi-label { font-size: 10px; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: rgba(10,10,11,0.38); margin-bottom: 12px; }
+  .at-kpi-value { font-variant-numeric: tabular-nums; color: #0A0A0B; line-height: 1; }
+  .at-kpi-sub { font-size: 11px; color: rgba(10,10,11,0.32); margin-top: 10px; }
+
+  /* Card */
+  .at-card { background: #fff; overflow: hidden; }
+  .at-card-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid rgba(10,10,11,0.06); }
+  .at-card-title { font-size: 13px; font-weight: 500; color: #0A0A0B; }
+  .at-card-meta { font-size: 11px; color: rgba(10,10,11,0.32); }
+
+  /* Table */
+  .at-table { width: 100%; border-collapse: collapse; }
+  .at-th { font-size: 10px; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: rgba(10,10,11,0.38); text-align: left; padding: 10px 20px; border-bottom: 1px solid rgba(10,10,11,0.06); white-space: nowrap; }
+  .at-td { padding: 11px 20px; border-bottom: 1px solid rgba(10,10,11,0.04); font-size: 13px; vertical-align: middle; }
+  .at-tr:last-child .at-td { border-bottom: none; }
+  .at-tr:hover .at-td { background: rgba(10,10,11,0.025); cursor: pointer; }
+
+  .dot { border-radius: 50%; display: inline-block; flex-shrink: 0; }
+
+  .at-bar-wrap { display: flex; align-items: center; gap: 8px; }
+  .at-bar-track { border-radius: 10px; background: rgba(10,10,11,0.08); overflow: hidden; flex-shrink: 0; width: 60px; }
+  .at-bar-fill { height: 100%; border-radius: 10px; }
+
+  /* New project btn */
+  .at-btn-outline {
+    height: 30px; padding: 0 14px; border-radius: 6px; border: 1px solid rgba(10,10,11,0.14);
+    background: #fff; font-size: 12px; font-weight: 500; color: #0A0A0B; cursor: pointer;
+    font-family: 'Inter', system-ui;
+  }
+
+  /* Pages show/hide */
+  #page-overview { display: flex; flex-direction: column; gap: 20px; }
+  #page-projects { display: flex; flex-direction: column; gap: 20px; }
+  .page-hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="shell-header">
+  <strong>ArchiTrack — Design Preview</strong>
+  <span>Ajuste os controles • veja em tempo real • copie o prompt</span>
+</div>
+
+<div class="shell-body">
+
+  <!-- Controls -->
+  <div class="controls">
+
+    <div class="ctrl-group">
+      <span class="ctrl-label">Tela</span>
+      <div class="tab-row">
+        <button class="tab-btn active" id="tab-overview" onclick="switchPage('overview')">Painel</button>
+        <button class="tab-btn" id="tab-projects" onclick="switchPage('projects')">Projetos</button>
+      </div>
+    </div>
+
+    <div class="ctrl-group">
+      <span class="ctrl-label">Sidebar</span>
+      <div class="ctrl-row"><span class="ctrl-name">Largura</span><span class="ctrl-val" id="v-sw">200px</span></div>
+      <input type="range" min="160" max="240" value="200" step="4" oninput="set('sidebarW',+this.value,'v-sw','px')">
+      <div class="ctrl-row"><span class="ctrl-name">Altura topbar</span><span class="ctrl-val" id="v-th">52px</span></div>
+      <input type="range" min="40" max="72" value="52" step="2" oninput="set('topbarH',+this.value,'v-th','px')">
+      <div class="ctrl-row"><span class="ctrl-name">Padding interno</span><span class="ctrl-val" id="v-sp">10px</span></div>
+      <input type="range" min="6" max="16" value="10" step="1" oninput="set('sidebarPad',+this.value,'v-sp','px')">
+    </div>
+
+    <div class="ctrl-group">
+      <span class="ctrl-label">KPI Numbers</span>
+      <div class="ctrl-row"><span class="ctrl-name">Font size</span><span class="ctrl-val" id="v-ks">42px</span></div>
+      <input type="range" min="28" max="64" value="42" step="2" oninput="set('kpiSize',+this.value,'v-ks','px')">
+      <div class="ctrl-row"><span class="ctrl-name">Font weight</span><span class="ctrl-val" id="v-kw">300</span></div>
+      <input type="range" min="200" max="600" value="300" step="100" oninput="set('kpiWeight',+this.value,'v-kw','')">
+      <div class="ctrl-row"><span class="ctrl-name">Letter-spacing</span><span class="ctrl-val" id="v-kl">-0.04em</span></div>
+      <input type="range" min="-8" max="2" value="-4" step="1"
+        oninput="state.kpiLS=+this.value/100; document.getElementById('v-kl').textContent=(+this.value/100)+'em'; updateAll();">
+    </div>
+
+    <div class="ctrl-group">
+      <span class="ctrl-label">Tabela</span>
+      <div class="ctrl-row"><span class="ctrl-name">Row padding vertical</span><span class="ctrl-val" id="v-rp">11px</span></div>
+      <input type="range" min="6" max="18" value="11" step="1" oninput="set('rowPad',+this.value,'v-rp','px')">
+      <div class="ctrl-row"><span class="ctrl-name">Progress bar height</span><span class="ctrl-val" id="v-bh">3px</span></div>
+      <input type="range" min="2" max="10" value="3" step="1" oninput="set('barH',+this.value,'v-bh','px')">
+    </div>
+
+    <div class="ctrl-group">
+      <span class="ctrl-label">Cards</span>
+      <div class="ctrl-row"><span class="ctrl-name">Border radius</span><span class="ctrl-val" id="v-cr">8px</span></div>
+      <input type="range" min="0" max="16" value="8" step="1" oninput="set('radius',+this.value,'v-cr','px')">
+      <div class="ctrl-row"><span class="ctrl-name">Padding principal</span><span class="ctrl-val" id="v-mp">28px</span></div>
+      <input type="range" min="16" max="48" value="28" step="2" oninput="set('mainPad',+this.value,'v-mp','px')">
+    </div>
+
+    <div class="ctrl-group">
+      <span class="ctrl-label">Opções</span>
+      <div class="toggle-row">
+        <span class="ctrl-name">Dots nos projetos</span>
+        <label class="toggle"><input type="checkbox" checked onchange="state.showDots=this.checked; updateAll();"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+      </div>
+      <div class="toggle-row">
+        <span class="ctrl-name">Sombra macOS</span>
+        <label class="toggle"><input type="checkbox" checked onchange="state.macShadow=this.checked; updateAll();"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Preview -->
+  <div class="preview-wrap">
+    <div id="preview-frame">
+
+      <!-- ArchiTrack Dashboard (static structure) -->
+      <div class="at" id="at-root">
+
+        <!-- Sidebar -->
+        <div id="at-sidebar">
+          <div id="at-logo">
+            <div>
+              <div class="at-logo-name">ArchiTrack</div>
+              <div class="at-logo-sub">Gestão de Escritório</div>
+            </div>
+          </div>
+
+          <nav id="at-nav">
+            <div class="at-nav-item active" data-page="overview">
+              <span class="nav-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              </span>
+              Painel
+            </div>
+            <div class="at-nav-item" data-page="projects">
+              <span class="nav-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              </span>
+              Projetos
+            </div>
+            <div class="at-nav-item">
+              <span class="nav-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </span>
+              Equipe
+            </div>
+            <div class="at-nav-item">
+              <span class="nav-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              </span>
+              Configurações
+            </div>
+          </nav>
+
+          <div id="at-sidebar-footer">
+            <button class="at-signout">
+              <span style="opacity:0.5;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              </span>
+              Sair
+            </button>
+          </div>
+        </div>
+
+        <!-- Main content -->
+        <div id="at-main">
+
+          <!-- PAGE: Overview -->
+          <div id="page-overview">
+            <div class="at-page-header">
+              <h1 class="at-page-title">Painel</h1>
+              <span class="at-page-meta">Últimos 7 dias</span>
+            </div>
+
+            <div class="at-kpi-grid">
+              <div class="at-kpi-card" id="kpi-0"><div class="at-kpi-label">Horas — 7 dias</div><div class="at-kpi-value">38.5h</div><div class="at-kpi-sub">Total de horas registradas</div></div>
+              <div class="at-kpi-card" id="kpi-1"><div class="at-kpi-label">Projetos ativos</div><div class="at-kpi-value">5</div><div class="at-kpi-sub">Em andamento agora</div></div>
+              <div class="at-kpi-card" id="kpi-2"><div class="at-kpi-label">Registros — 7 dias</div><div class="at-kpi-value">24</div><div class="at-kpi-sub">Via WhatsApp e dashboard</div></div>
+            </div>
+
+            <div class="at-card" id="entries-card">
+              <div class="at-card-header">
+                <span class="at-card-title">Registros recentes</span>
+                <span class="at-card-meta">6 registros</span>
+              </div>
+              <table class="at-table">
+                <thead>
+                  <tr>
+                    <th class="at-th" style="width:24px; padding:10px 8px 10px 20px;"></th>
+                    <th class="at-th">Arquiteto</th>
+                    <th class="at-th">Projeto</th>
+                    <th class="at-th">Atividade</th>
+                    <th class="at-th">Duração</th>
+                    <th class="at-th">Origem</th>
+                    <th class="at-th">Quando</th>
+                  </tr>
+                </thead>
+                <tbody id="entries-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- PAGE: Projects -->
+          <div id="page-projects" class="page-hidden">
+            <div class="at-page-header">
+              <h1 class="at-page-title">Projetos</h1>
+              <button class="at-btn-outline">+ Novo projeto</button>
+            </div>
+
+            <div class="at-card" id="projects-card">
+              <table class="at-table">
+                <thead>
+                  <tr>
+                    <th class="at-th" style="width:32px; padding:10px 0 10px 20px;"></th>
+                    <th class="at-th">Projeto</th>
+                    <th class="at-th">Cliente</th>
+                    <th class="at-th">Etapa</th>
+                    <th class="at-th">Status</th>
+                    <th class="at-th">Horas</th>
+                    <th class="at-th">Orçado</th>
+                    <th class="at-th">Uso</th>
+                  </tr>
+                </thead>
+                <tbody id="projects-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div><!-- /at-main -->
+      </div><!-- /at-root -->
+
+    </div><!-- /preview-frame -->
+
+    <div class="prompt-wrap">
+      <div id="prompt-out">…</div>
+      <button class="copy-btn" id="copy-btn" onclick="copyPrompt()">Copiar</button>
+    </div>
+  </div>
+
+</div><!-- /shell-body -->
+
+<script>
+// ─── Data ──────────────────────────────────────────────────────────────────────
+const PALETTE = ['#B5614A','#4E7C5E','#3B5E7A','#7A5E3B','#654E7A','#3B6E6E','#7A6E3B','#5E3B65'];
+function projectColor(name) {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) { h = Math.imul(31, h) + name.charCodeAt(i) | 0; }
+  return PALETTE[Math.abs(h) % PALETTE.length];
+}
+
+const PROJECTS = [
+  { name: 'Residência Higienópolis', client: 'Família Meireles', phase: 'Desenvolvimento', status: 'active',    hours: 124, budget: 200, pct: 62 },
+  { name: 'Escritório Faria Lima',   client: 'TechCorp Ltda',    phase: 'Anteprojeto',    status: 'active',    hours: 89,  budget: 120, pct: 74 },
+  { name: 'Loft Pinheiros',          client: 'Carlos Drummond',  phase: 'Executivo',      status: 'paused',    hours: 56,  budget: 80,  pct: 70 },
+  { name: 'Casa Alphaville',         client: 'Família Souza',    phase: 'Conceitual',     status: 'active',    hours: 22,  budget: 160, pct: 14 },
+  { name: 'Torre Berrini',           client: 'Construtora ABC',  phase: 'Desenvolvimento', status: 'active',   hours: 198, budget: 240, pct: 83 },
+];
+const ENTRIES = [
+  { user: 'Ana Souza',    proj: 'Residência Higienópolis', act: 'Desenvolvimento',      dur: '2h30min', src: 'whatsapp',  when: 'há 12 min' },
+  { user: 'Bruno Lima',   proj: 'Escritório Faria Lima',   act: 'Reunião de Briefing',  dur: '1h',      src: 'timer',     when: 'há 1h' },
+  { user: 'Carla Mendes', proj: 'Torre Berrini',           act: 'Revisão de Plantas',   dur: '3h',      src: 'whatsapp',  when: 'há 2h' },
+  { user: 'Ana Souza',    proj: 'Casa Alphaville',         act: 'Estudo de Viabilidade', dur: '45min',  src: 'dashboard', when: 'há 3h' },
+  { user: 'Bruno Lima',   proj: 'Loft Pinheiros',          act: 'Modelagem 3D',         dur: '4h',      src: 'timer',     when: 'há 5h' },
+  { user: 'Carla Mendes', proj: 'Residência Higienópolis', act: 'Detalhamento',         dur: '2h',      src: 'whatsapp',  when: 'ontem' },
+];
+const STATUS_CFG = {
+  active:    { label: 'Ativo',     dot: '#16A34A' },
+  paused:    { label: 'Pausado',   dot: '#D97706' },
+  completed: { label: 'Concluído', dot: '#2563EB' },
+  cancelled: { label: 'Cancelado', dot: '#DC2626' },
+};
+const SRC_COLORS = { whatsapp: '#16A34A', timer: '#0066CC', dashboard: 'rgba(10,10,11,0.28)' };
+const SRC_LABELS = { whatsapp: 'WhatsApp', timer: 'Timer', dashboard: 'Dashboard' };
+
+// ─── State ──────────────────────────────────────────────────────────────────────
+const DEFAULTS = { sidebarW:200, topbarH:52, sidebarPad:10, kpiSize:42, kpiWeight:300, kpiLS:-0.04, rowPad:11, barH:3, radius:8, mainPad:28, showDots:true, macShadow:true };
+const state = { ...DEFAULTS, page:'overview' };
+
+function set(key, val, valId, suffix) {
+  state[key] = val;
+  document.getElementById(valId).textContent = val + suffix;
+  updateAll();
+}
+
+// ─── DOM builders (no innerHTML) ──────────────────────────────────────────────
+function makeDot(size, color) {
+  const d = document.createElement('span');
+  d.className = 'dot';
+  d.style.cssText = `width:${size}px;height:${size}px;background:${color};`;
+  return d;
+}
+function makeCell(content, styles) {
+  const td = document.createElement('td');
+  td.className = 'at-td';
+  td.style.cssText = styles || '';
+  if (typeof content === 'string') {
+    td.textContent = content;
+  } else if (content) {
+    td.appendChild(content);
+  }
+  return td;
+}
+function makeFlex(items, gap) {
+  const div = document.createElement('div');
+  div.style.cssText = `display:flex;align-items:center;gap:${gap || 6}px;`;
+  items.forEach(i => { if (i) div.appendChild(i); });
+  return div;
+}
+function makeText(text, styles) {
+  const span = document.createElement('span');
+  span.textContent = text;
+  span.style.cssText = styles || '';
+  return span;
+}
+
+// ─── Render Tables ──────────────────────────────────────────────────────────────
+function renderEntriesTable() {
+  const tbody = document.getElementById('entries-tbody');
+  while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
+
+  const rp = state.rowPad;
+  ENTRIES.forEach((e, idx) => {
+    const col = projectColor(e.proj);
+    const tr = document.createElement('tr');
+    tr.className = 'at-tr';
+
+    // chevron
+    const chTd = document.createElement('td');
+    chTd.className = 'at-td';
+    chTd.style.cssText = `padding:${rp}px 8px ${rp}px 20px;width:24px;`;
+    const chSvg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    chSvg.setAttribute('width','11'); chSvg.setAttribute('height','11'); chSvg.setAttribute('viewBox','0 0 24 24');
+    chSvg.setAttribute('fill','none'); chSvg.setAttribute('stroke','rgba(10,10,11,0.22)'); chSvg.setAttribute('stroke-width','2');
+    const chPoly = document.createElementNS('http://www.w3.org/2000/svg','polyline');
+    chPoly.setAttribute('points','9 18 15 12 9 6'); chSvg.appendChild(chPoly); chTd.appendChild(chSvg);
+    tr.appendChild(chTd);
+
+    // user
+    tr.appendChild(makeCell(e.user, `padding:${rp}px 16px;font-weight:500;color:#0A0A0B;white-space:nowrap;`));
+
+    // project with dot
+    const projTd = makeCell(null, `padding:${rp}px 16px;white-space:nowrap;`);
+    const projFlex = makeFlex(
+      state.showDots ? [makeDot(5, col), makeText(e.proj, 'color:rgba(10,10,11,0.62);')] : [makeText(e.proj, 'color:rgba(10,10,11,0.62);')],
+      6
+    );
+    projTd.appendChild(projFlex);
+    tr.appendChild(projTd);
+
+    // activity
+    tr.appendChild(makeCell(e.act, `padding:${rp}px 16px;color:rgba(10,10,11,0.48);`));
+
+    // duration
+    tr.appendChild(makeCell(e.dur, `padding:${rp}px 16px;color:#0A0A0B;font-variant-numeric:tabular-nums;white-space:nowrap;`));
+
+    // source
+    const srcTd = makeCell(null, `padding:${rp}px 16px;`);
+    srcTd.appendChild(makeFlex([
+      makeDot(4, SRC_COLORS[e.src] || 'rgba(10,10,11,0.28)'),
+      makeText(SRC_LABELS[e.src] || e.src, 'font-size:12px;color:rgba(10,10,11,0.42);white-space:nowrap;')
+    ], 5));
+    tr.appendChild(srcTd);
+
+    // when
+    tr.appendChild(makeCell(e.when, `padding:${rp}px 16px;font-size:11px;color:rgba(10,10,11,0.28);white-space:nowrap;`));
+
+    tbody.appendChild(tr);
+  });
+}
+
+function renderProjectsTable() {
+  const tbody = document.getElementById('projects-tbody');
+  while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
+
+  const rp = state.rowPad;
+  const bh = state.barH;
+  PROJECTS.forEach((p, idx) => {
+    const dot = projectColor(p.name);
+    const s = STATUS_CFG[p.status] || STATUS_CFG.active;
+    const isAlert = p.pct >= 80;
+    const tr = document.createElement('tr');
+    tr.className = 'at-tr';
+
+    // project dot
+    const dotTd = makeCell(null, `padding:${rp}px 0 ${rp}px 20px;width:32px;`);
+    if (state.showDots) dotTd.appendChild(makeDot(7, dot));
+    tr.appendChild(dotTd);
+
+    // name
+    tr.appendChild(makeCell(p.name, `padding:${rp}px 20px;font-weight:500;color:#0A0A0B;white-space:nowrap;`));
+    // client
+    tr.appendChild(makeCell(p.client, `padding:${rp}px 20px;color:rgba(10,10,11,0.48);`));
+    // phase
+    tr.appendChild(makeCell(p.phase, `padding:${rp}px 20px;color:rgba(10,10,11,0.48);`));
+
+    // status
+    const stTd = makeCell(null, `padding:${rp}px 20px;`);
+    stTd.appendChild(makeFlex([
+      makeDot(5, s.dot),
+      makeText(s.label, 'font-size:12px;color:rgba(10,10,11,0.52);white-space:nowrap;')
+    ], 6));
+    tr.appendChild(stTd);
+
+    // hours
+    tr.appendChild(makeCell(p.hours + 'h', `padding:${rp}px 20px;color:#0A0A0B;font-variant-numeric:tabular-nums;`));
+    // budget
+    tr.appendChild(makeCell(p.budget + 'h', `padding:${rp}px 20px;color:rgba(10,10,11,0.38);font-variant-numeric:tabular-nums;`));
+
+    // usage bar
+    const useTd = makeCell(null, `padding:${rp}px 20px;min-width:110px;`);
+    const barWrap = document.createElement('div');
+    barWrap.className = 'at-bar-wrap';
+    const barTrack = document.createElement('div');
+    barTrack.className = 'at-bar-track';
+    barTrack.style.height = bh + 'px';
+    const barFill = document.createElement('div');
+    barFill.className = 'at-bar-fill';
+    barFill.style.cssText = `width:${Math.min(p.pct,100)}%;background:${isAlert ? '#DC2626' : dot};height:${bh}px;`;
+    barTrack.appendChild(barFill);
+    const pctSpan = makeText(p.pct + '%', `font-size:12px;font-variant-numeric:tabular-nums;font-weight:${isAlert?500:400};color:${isAlert?'#DC2626':'rgba(10,10,11,0.48)'};white-space:nowrap;`);
+    barWrap.appendChild(barTrack);
+    barWrap.appendChild(pctSpan);
+    useTd.appendChild(barWrap);
+    tr.appendChild(useTd);
+
+    tbody.appendChild(tr);
+  });
+}
+
+// ─── Apply styles ──────────────────────────────────────────────────────────────
+function shadowVal() {
+  return state.macShadow
+    ? '0 1px 2px rgba(0,0,0,0.06), 0 0 0 0.5px rgba(0,0,0,0.05)'
+    : '0 2px 6px rgba(0,0,0,0.12)';
+}
+
+function applyStyles() {
+  // Sidebar width
+  document.getElementById('at-sidebar').style.width = state.sidebarW + 'px';
+
+  // Logo height
+  document.getElementById('at-logo').style.height = state.topbarH + 'px';
+
+  // Sidebar nav padding
+  document.getElementById('at-nav').style.padding = state.sidebarPad + 'px';
+  document.getElementById('at-sidebar-footer').style.padding = state.sidebarPad + 'px';
+
+  // Nav item padding
+  document.querySelectorAll('.at-nav-item').forEach(el => {
+    el.style.padding = '0 ' + state.sidebarPad + 'px';
+  });
+  const signout = document.querySelector('.at-signout');
+  if (signout) signout.style.padding = '0 ' + state.sidebarPad + 'px';
+
+  // Main padding
+  document.getElementById('at-main').style.padding = state.mainPad + 'px';
+
+  // KPI values
+  document.querySelectorAll('.at-kpi-value').forEach(el => {
+    el.style.fontSize = state.kpiSize + 'px';
+    el.style.fontWeight = state.kpiWeight;
+    el.style.letterSpacing = state.kpiLS + 'em';
+  });
+
+  // KPI card radius + shadow
+  document.querySelectorAll('.at-kpi-card').forEach(el => {
+    el.style.borderRadius = state.radius + 'px';
+    el.style.boxShadow = shadowVal();
+    el.style.padding = '20px 22px 18px';
+  });
+
+  // Card radius + shadow
+  ['entries-card','projects-card'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.style.borderRadius = state.radius + 'px'; el.style.boxShadow = shadowVal(); }
+  });
+}
+
+// ─── Page switch ───────────────────────────────────────────────────────────────
+function switchPage(page) {
+  state.page = page;
+  document.getElementById('page-overview').classList.toggle('page-hidden', page !== 'overview');
+  document.getElementById('page-projects').classList.toggle('page-hidden', page !== 'projects');
+  document.getElementById('tab-overview').classList.toggle('active', page === 'overview');
+  document.getElementById('tab-projects').classList.toggle('active', page === 'projects');
+  document.querySelectorAll('.at-nav-item[data-page]').forEach(el => {
+    el.classList.toggle('active', el.dataset.page === page);
+  });
+  updateAll();
+}
+
+// ─── Prompt ─────────────────────────────────────────────────────────────────────
+function updatePrompt() {
+  const D = DEFAULTS;
+  const parts = [];
+  if (state.sidebarW !== D.sidebarW)   parts.push('sidebar ' + state.sidebarW + 'px de largura');
+  if (state.topbarH !== D.topbarH)     parts.push('topbar ' + state.topbarH + 'px de altura');
+  if (state.sidebarPad !== D.sidebarPad) parts.push('padding sidebar ' + state.sidebarPad + 'px');
+  if (state.kpiSize !== D.kpiSize)     parts.push('KPI ' + state.kpiSize + 'px');
+  if (state.kpiWeight !== D.kpiWeight) parts.push('font-weight ' + state.kpiWeight + ' nos KPIs');
+  if (state.kpiLS !== D.kpiLS)         parts.push('letter-spacing ' + state.kpiLS + 'em');
+  if (state.rowPad !== D.rowPad)       parts.push('rows ' + state.rowPad + 'px vertical');
+  if (state.barH !== D.barH)           parts.push('barra ' + state.barH + 'px');
+  if (state.radius !== D.radius)       parts.push('radius ' + state.radius + 'px');
+  if (state.mainPad !== D.mainPad)     parts.push('padding principal ' + state.mainPad + 'px');
+  if (!state.showDots)  parts.push('sem dots coloridos');
+  if (!state.macShadow) parts.push('shadow padrão');
+
+  const base = 'ArchiTrack design system: sidebar ' + D.sidebarW + 'px, topbar ' + D.topbarH + 'px, padding ' + D.sidebarPad + 'px. '
+    + 'KPIs: ' + D.kpiSize + 'px / weight ' + D.kpiWeight + ' / tracking ' + D.kpiLS + 'em. '
+    + 'Rows: ' + D.rowPad + 'px vertical. Progress bars: ' + D.barH + 'px. Border-radius: ' + D.radius + 'px. '
+    + 'Paleta: fundo #F6F6F7, superfícies #fff, tinta #0A0A0B, accent #0066CC. '
+    + 'Sombra macOS: 0 1px 2px rgba(0,0,0,0.06) + 0.5px ring.';
+  const extra = parts.length ? ' Ajustes: ' + parts.join('; ') + '.' : ' Defaults — pronto para implementar.';
+  document.getElementById('prompt-out').textContent = base + extra;
+}
+
+// ─── Master update ─────────────────────────────────────────────────────────────
+function updateAll() {
+  applyStyles();
+  renderEntriesTable();
+  renderProjectsTable();
+  updatePrompt();
+}
+
+function copyPrompt() {
+  const text = document.getElementById('prompt-out').textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = 'Copiado!';
+    btn.classList.add('copied');
+    setTimeout(function() { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ─── Init ──────────────────────────────────────────────────────────────────────
+updateAll();
+</script>
+</body>
+</html>
