@@ -9,7 +9,7 @@ export default async function OverviewPage() {
   weekStart.setDate(weekStart.getDate() - 7)
   weekStart.setHours(0, 0, 0, 0)
 
-  const [teResult, prResult] = await Promise.all([
+  const [{ data: timeEntries }, { data: projects }] = await Promise.all([
     supabase
       .from('time_entries')
       .select(`
@@ -29,12 +29,6 @@ export default async function OverviewPage() {
       .eq('status', 'active')
       .eq('is_deleted', false),
   ])
-
-  if (teResult.error) console.error('[overview] time_entries error:', JSON.stringify(teResult.error))
-  if (prResult.error) console.error('[overview] projects error:', JSON.stringify(prResult.error))
-
-  const timeEntries = teResult.data
-  const projects = prResult.data
 
   const totalMinutes =
     timeEntries?.reduce((sum, e) => sum + (e.duration_min || 0), 0) || 0
