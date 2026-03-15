@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { MailCheck } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 export function LoginForm() {
@@ -35,30 +36,45 @@ export function LoginForm() {
       <div
         style={{
           background: '#fff',
-          borderRadius: 10,
-          boxShadow: '0 1px 2px rgba(0,0,0,0.06), 0 0 0 0.5px rgba(0,0,0,0.05)',
-          padding: '32px 28px',
+          borderRadius: 12,
+          boxShadow: '0 1px 3px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04)',
+          padding: '36px 28px',
           textAlign: 'center',
         }}
       >
-        <div style={{ fontSize: 32, marginBottom: 12 }}>📬</div>
-        <h2 style={{ fontSize: 15, fontWeight: 500, color: '#0A0A0B', marginBottom: 6 }}>
+        <div
+          style={{
+            width: 48,
+            height: 48,
+            borderRadius: 14,
+            background: 'rgba(181,97,74,0.10)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 16px',
+          }}
+        >
+          <MailCheck style={{ width: 22, height: 22, color: '#B5614A' }} />
+        </div>
+        <h2 style={{ fontSize: 15, fontWeight: 600, color: '#0A0A0B', marginBottom: 8, letterSpacing: '-0.015em' }}>
           Link enviado!
         </h2>
-        <p style={{ fontSize: 13, color: 'rgba(10,10,11,0.48)', lineHeight: 1.6 }}>
-          Verifique seu e-mail <strong style={{ color: '#0A0A0B' }}>{email}</strong> e clique no
-          link para entrar.
+        <p style={{ fontSize: 13, color: 'rgba(10,10,11,0.50)', lineHeight: 1.65, margin: 0 }}>
+          Verifique seu e-mail <strong style={{ color: '#0A0A0B', fontWeight: 500 }}>{email}</strong> e
+          clique no link para entrar.
         </p>
         <button
           onClick={() => { setSent(false); setEmail('') }}
           style={{
-            marginTop: 16,
+            marginTop: 20,
             fontSize: 12,
             color: '#B5614A',
             background: 'none',
             border: 'none',
             cursor: 'pointer',
             fontFamily: 'inherit',
+            fontWeight: 500,
+            letterSpacing: '0.01em',
           }}
         >
           Usar outro e-mail
@@ -71,15 +87,15 @@ export function LoginForm() {
     <div
       style={{
         background: '#fff',
-        borderRadius: 10,
-        boxShadow: '0 1px 2px rgba(0,0,0,0.06), 0 0 0 0.5px rgba(0,0,0,0.05)',
+        borderRadius: 12,
+        boxShadow: '0 1px 3px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04)',
         padding: '32px 28px',
       }}
     >
-      <h2 style={{ fontSize: 15, fontWeight: 500, color: '#0A0A0B', marginBottom: 4 }}>
+      <h2 style={{ fontSize: 16, fontWeight: 600, color: '#0A0A0B', marginBottom: 4, letterSpacing: '-0.02em' }}>
         Entrar
       </h2>
-      <p style={{ fontSize: 13, color: 'rgba(10,10,11,0.45)', marginBottom: 24 }}>
+      <p style={{ fontSize: 13, color: 'rgba(10,10,11,0.45)', marginBottom: 24, lineHeight: 1.5 }}>
         Informe seu e-mail para receber o link de acesso.
       </p>
 

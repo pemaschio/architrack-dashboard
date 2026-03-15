@@ -1,5 +1,6 @@
 'use client'
 
+import type { CSSProperties } from 'react'
 import {
   BarChart,
   Bar,
@@ -18,13 +19,20 @@ interface Props {
 }
 
 export function HoursBarChart({ data, selectedProject, onBarClick }: Props) {
+  const cardStyle: CSSProperties = {
+    background: '#ffffff',
+    borderRadius: 10,
+    padding: '20px 22px',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04)',
+  }
+
   if (data.length === 0) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-5">
-        <h2 className="text-sm font-medium text-gray-700 mb-4">
+      <div style={cardStyle}>
+        <h2 style={{ fontSize: 13, fontWeight: 500, color: '#0A0A0B', marginBottom: 16, margin: '0 0 16px' }}>
           Horas por projeto — últimos 7 dias
         </h2>
-        <div className="flex items-center justify-center h-48 text-gray-400 text-sm">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 192, fontSize: 13, color: 'rgba(10,10,11,0.32)' }}>
           Nenhum dado no período.
         </div>
       </div>
@@ -32,18 +40,20 @@ export function HoursBarChart({ data, selectedProject, onBarClick }: Props) {
   }
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-5">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-sm font-medium text-gray-700">
-          Horas por projeto — últimos 7 dias (top 10)
+    <div style={cardStyle}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+        <h2 style={{ fontSize: 13, fontWeight: 500, color: '#0A0A0B', margin: 0 }}>
+          Horas por projeto — últimos 7 dias
         </h2>
         {selectedProject && (
-          <span className="text-xs text-blue-600 font-medium">
-            Filtrando por: {selectedProject}
+          <span style={{ fontSize: 11, fontWeight: 500, color: '#B5614A' }}>
+            {selectedProject}
           </span>
         )}
       </div>
-      <p className="text-xs text-gray-400 mb-3">Clique em uma barra para filtrar os registros</p>
+      <p style={{ fontSize: 11, color: 'rgba(10,10,11,0.32)', marginBottom: 16, marginTop: 2 }}>
+        Clique em uma barra para filtrar os registros
+      </p>
       <ResponsiveContainer width="100%" height={280}>
         <BarChart
           data={data}
@@ -55,30 +65,43 @@ export function HoursBarChart({ data, selectedProject, onBarClick }: Props) {
           }}
           style={{ cursor: onBarClick ? 'pointer' : 'default' }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+          <CartesianGrid strokeDasharray="2 4" stroke="rgba(10,10,11,0.06)" vertical={false} />
           <XAxis
             dataKey="name"
-            tick={{ fontSize: 11 }}
+            tick={{ fontSize: 10.5, fill: 'rgba(10,10,11,0.42)' }}
             angle={-30}
             textAnchor="end"
             interval={0}
+            axisLine={false}
+            tickLine={false}
           />
-          <YAxis tick={{ fontSize: 11 }} unit="h" />
+          <YAxis
+            tick={{ fontSize: 10.5, fill: 'rgba(10,10,11,0.32)' }}
+            unit="h"
+            axisLine={false}
+            tickLine={false}
+          />
           <Tooltip
             formatter={(value: number) => [`${value}h`, 'Horas']}
-            contentStyle={{ fontSize: 12 }}
-            cursor={{ fill: 'rgba(37, 99, 235, 0.05)' }}
+            contentStyle={{
+              fontSize: 12,
+              border: 'none',
+              borderRadius: 8,
+              boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+              padding: '8px 12px',
+            }}
+            cursor={{ fill: 'rgba(181,97,74,0.04)' }}
           />
-          <Bar dataKey="horas" radius={[4, 4, 0, 0]}>
+          <Bar dataKey="horas" radius={[5, 5, 0, 0]}>
             {data.map((entry) => (
               <Cell
                 key={entry.name}
                 fill={
                   selectedProject === null || selectedProject === undefined
-                    ? '#2563EB'
+                    ? '#B5614A'
                     : selectedProject === entry.name
-                    ? '#2563EB'
-                    : '#CBD5E1'
+                    ? '#B5614A'
+                    : 'rgba(10,10,11,0.10)'
                 }
               />
             ))}

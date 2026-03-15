@@ -9,18 +9,43 @@ export default function LoginPage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: '#F6F6F7',
+        background: '#F4F2EF',
+        backgroundImage: `
+          linear-gradient(rgba(181,97,74,0.04) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(181,97,74,0.04) 1px, transparent 1px)
+        `,
+        backgroundSize: '40px 40px',
       }}
     >
-      <div style={{ width: '100%', maxWidth: 380 }}>
-        <div style={{ textAlign: 'center', marginBottom: 28 }}>
+      <div style={{ width: '100%', maxWidth: 400, padding: '0 20px' }}>
+        {/* Brand mark */}
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 13,
+              background: '#B5614A',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 14px',
+              boxShadow: '0 4px 14px rgba(181,97,74,0.30)',
+            }}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 20h9"/>
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+          </div>
           <h1
             style={{
-              fontSize: 20,
-              fontWeight: 600,
-              letterSpacing: '-0.025em',
-              color: '#B5614A',
+              fontSize: 22,
+              fontWeight: 700,
+              letterSpacing: '-0.04em',
+              color: '#1A1714',
               lineHeight: 1,
+              margin: 0,
             }}
           >
             ArchiTrack
@@ -29,10 +54,10 @@ export default function LoginPage() {
             style={{
               fontSize: 11,
               fontWeight: 500,
-              letterSpacing: '0.06em',
+              letterSpacing: '0.08em',
               textTransform: 'uppercase',
-              color: 'rgba(10,10,11,0.32)',
-              marginTop: 5,
+              color: 'rgba(10,10,11,0.34)',
+              marginTop: 6,
             }}
           >
             Gestão de Escritório
@@ -42,6 +67,10 @@ export default function LoginPage() {
         <Suspense fallback={null}>
           <LoginForm />
         </Suspense>
+
+        <p style={{ textAlign: 'center', marginTop: 20, fontSize: 11, color: 'rgba(10,10,11,0.24)' }}>
+          Acesso exclusivo para colaboradores
+        </p>
       </div>
     </div>
   )

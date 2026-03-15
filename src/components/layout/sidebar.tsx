@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { LayoutDashboard, FolderOpen, Users, Settings, LogOut } from 'lucide-react'
+import { LayoutDashboard, FolderOpen, Users, Settings, LogOut, PenSquare } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 const navItems = [
@@ -25,33 +25,50 @@ export function Sidebar() {
   return (
     <aside
       style={{
-        width: 200,
+        width: 220,
         flexShrink: 0,
         display: 'flex',
         flexDirection: 'column',
-        background: 'rgba(246,246,247,0.9)',
-        borderRight: '1px solid rgba(10,10,11,0.08)',
+        background: '#EFEDE9',
+        borderRight: '1px solid rgba(10,10,11,0.07)',
       }}
     >
       {/* Logo mark */}
       <div
         style={{
-          height: 52,
+          height: 60,
           display: 'flex',
           alignItems: 'center',
-          paddingLeft: 16,
-          paddingRight: 16,
+          paddingLeft: 18,
+          paddingRight: 18,
           borderBottom: '1px solid rgba(10,10,11,0.06)',
           flexShrink: 0,
+          gap: 10,
         }}
       >
+        {/* Brand icon */}
+        <div
+          style={{
+            width: 30,
+            height: 30,
+            borderRadius: 8,
+            background: '#B5614A',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+          }}
+        >
+          <PenSquare style={{ width: 15, height: 15, color: '#fff' }} />
+        </div>
+
         <div>
           <div
             style={{
               fontSize: 13,
               fontWeight: 600,
-              letterSpacing: '-0.025em',
-              color: '#B5614A',
+              letterSpacing: '-0.03em',
+              color: '#1A1714',
               lineHeight: 1,
             }}
           >
@@ -59,10 +76,10 @@ export function Sidebar() {
           </div>
           <div
             style={{
-              fontSize: 9.5,
+              fontSize: 9,
               fontWeight: 500,
-              letterSpacing: '0.06em',
-              color: 'rgba(10,10,11,0.32)',
+              letterSpacing: '0.08em',
+              color: 'rgba(10,10,11,0.36)',
               marginTop: 3,
               textTransform: 'uppercase',
             }}
@@ -73,7 +90,7 @@ export function Sidebar() {
       </div>
 
       {/* Nav */}
-      <nav style={{ flex: 1, padding: 10 }}>
+      <nav style={{ flex: 1, padding: '12px 10px' }}>
         {navItems.map(({ href, label, icon: Icon }) => {
           const isActive = pathname.startsWith(href)
           return (
@@ -85,40 +102,43 @@ export function Sidebar() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 9,
-                height: 32,
-                paddingLeft: isActive ? 8 : 10,
+                height: 34,
+                paddingLeft: 10,
                 paddingRight: 10,
-                borderRadius: 5,
-                marginBottom: 1,
+                borderRadius: 7,
+                marginBottom: 2,
                 fontSize: 13,
                 fontWeight: isActive ? 500 : 400,
-                color: isActive ? '#0A0A0B' : 'rgba(10,10,11,0.52)',
-                background: isActive ? 'rgba(181,97,74,0.07)' : 'transparent',
+                color: isActive ? '#1A1714' : 'rgba(10,10,11,0.48)',
+                background: isActive ? 'rgba(181,97,74,0.10)' : 'transparent',
                 borderLeft: isActive ? '2px solid #B5614A' : '2px solid transparent',
                 textDecoration: 'none',
-                transition: 'background 0.1s ease, color 0.1s ease',
+                transition: 'background 0.15s ease, color 0.15s ease',
+                cursor: 'pointer',
               }}
               onMouseEnter={(e) => {
                 if (!isActive) {
                   const el = e.currentTarget as HTMLAnchorElement
-                  el.style.background = 'rgba(10,10,11,0.035)'
-                  el.style.color = '#0A0A0B'
+                  el.style.background = 'rgba(10,10,11,0.05)'
+                  el.style.color = '#1A1714'
                 }
               }}
               onMouseLeave={(e) => {
                 if (!isActive) {
                   const el = e.currentTarget as HTMLAnchorElement
                   el.style.background = 'transparent'
-                  el.style.color = 'rgba(10,10,11,0.52)'
+                  el.style.color = 'rgba(10,10,11,0.48)'
                 }
               }}
             >
               <Icon
                 style={{
-                  width: 14,
-                  height: 14,
+                  width: 15,
+                  height: 15,
                   flexShrink: 0,
-                  opacity: isActive ? 0.85 : 0.45,
+                  color: isActive ? '#B5614A' : 'currentColor',
+                  opacity: isActive ? 1 : 0.5,
+                  transition: 'opacity 0.15s ease',
                 }}
               />
               {label}
@@ -128,7 +148,7 @@ export function Sidebar() {
       </nav>
 
       {/* Sign out */}
-      <div style={{ padding: 10, borderTop: '1px solid rgba(10,10,11,0.06)' }}>
+      <div style={{ padding: '10px 10px 14px', borderTop: '1px solid rgba(10,10,11,0.06)' }}>
         <button
           onClick={handleSignOut}
           style={{
@@ -136,30 +156,30 @@ export function Sidebar() {
             alignItems: 'center',
             gap: 9,
             width: '100%',
-            height: 32,
+            height: 34,
             paddingLeft: 10,
             paddingRight: 10,
-            borderRadius: 5,
+            borderRadius: 7,
             fontSize: 13,
             fontWeight: 400,
-            color: 'rgba(10,10,11,0.40)',
+            color: 'rgba(10,10,11,0.38)',
             background: 'transparent',
             border: 'none',
             cursor: 'pointer',
-            transition: 'background 0.1s ease, color 0.1s ease',
+            transition: 'background 0.15s ease, color 0.15s ease',
           }}
           onMouseEnter={(e) => {
             const el = e.currentTarget as HTMLButtonElement
-            el.style.background = 'rgba(10,10,11,0.035)'
-            el.style.color = '#0A0A0B'
+            el.style.background = 'rgba(10,10,11,0.05)'
+            el.style.color = '#1A1714'
           }}
           onMouseLeave={(e) => {
             const el = e.currentTarget as HTMLButtonElement
             el.style.background = 'transparent'
-            el.style.color = 'rgba(10,10,11,0.40)'
+            el.style.color = 'rgba(10,10,11,0.38)'
           }}
         >
-          <LogOut style={{ width: 13, height: 13, flexShrink: 0, opacity: 0.5 }} />
+          <LogOut style={{ width: 14, height: 14, flexShrink: 0 }} />
           Sair
         </button>
       </div>

@@ -12,10 +12,10 @@ const roleLabels: Record<string, string> = {
   admin: 'Admin',
 }
 
-const roleColors: Record<string, string> = {
-  architect: 'bg-purple-100 text-purple-700',
-  director: 'bg-blue-100 text-blue-700',
-  admin: 'bg-orange-100 text-orange-700',
+const roleStyles: Record<string, { background: string; color: string }> = {
+  architect: { background: 'rgba(181,97,74,0.08)', color: '#B5614A' },
+  director:  { background: 'rgba(0,102,204,0.08)', color: '#0066CC' },
+  admin:     { background: 'rgba(10,10,11,0.07)', color: 'rgba(10,10,11,0.60)' },
 }
 
 interface User {
@@ -59,58 +59,112 @@ export function UserCardList({ users }: Props) {
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {users.map((user) => (
-          <button
-            key={user.id}
-            onClick={() => handleCardClick(user.id)}
-            className="bg-white rounded-lg border border-gray-200 p-5 text-left hover:border-gray-400 hover:shadow-sm transition-all duration-150 group"
-          >
-            <div className="flex items-start gap-3 mb-3">
-              {/* Avatar */}
-              <div className="w-10 h-10 rounded-xl bg-gray-900 flex items-center justify-center flex-shrink-0 group-hover:bg-gray-700 transition-colors">
-                <span className="text-white font-semibold text-sm">{initials(user.name)}</span>
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-2">
-                  <h2 className="font-medium text-gray-900 truncate">{user.name}</h2>
-                  <span
-                    className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium flex-shrink-0 ${
-                      roleColors[user.role] ?? 'bg-gray-100 text-gray-700'
-                    }`}
-                  >
-                    {roleLabels[user.role] ?? user.role}
-                  </span>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14 }}>
+        {users.map((user) => {
+          const roleSt = roleStyles[user.role] ?? { background: 'rgba(10,10,11,0.06)', color: 'rgba(10,10,11,0.55)' }
+          return (
+            <button
+              key={user.id}
+              onClick={() => handleCardClick(user.id)}
+              style={{
+                background: '#ffffff',
+                borderRadius: 10,
+                padding: '20px',
+                textAlign: 'left',
+                border: 'none',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04)',
+                cursor: 'pointer',
+                transition: 'box-shadow 0.2s ease, transform 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                const el = e.currentTarget as HTMLButtonElement
+                el.style.boxShadow = '0 4px 12px rgba(0,0,0,0.09), 0 0 0 1px rgba(0,0,0,0.05)'
+                el.style.transform = 'translateY(-1px)'
+              }}
+              onMouseLeave={(e) => {
+                const el = e.currentTarget as HTMLButtonElement
+                el.style.boxShadow = '0 1px 3px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04)'
+                el.style.transform = 'translateY(0)'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 14 }}>
+                {/* Avatar */}
+                <div
+                  style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: 10,
+                    background: '#1A1714',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <span style={{ color: '#fff', fontWeight: 600, fontSize: 13 }}>{initials(user.name)}</span>
                 </div>
-                <p className="text-xs text-gray-400 font-mono mt-0.5">{user.phone}</p>
-              </div>
-            </div>
 
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">
-                {user.hourly_rate
-                  ? `R$ ${user.hourly_rate.toFixed(2).replace('.', ',')}/hora`
-                  : 'Valor/hora não definido'}
-              </span>
-              <span
-                className={`inline-flex items-center gap-1 text-xs ${
-                  user.is_active ? 'text-emerald-600' : 'text-gray-400'
-                }`}
-              >
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+                    <h2 style={{ fontWeight: 500, color: '#0A0A0B', fontSize: 13, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {user.name}
+                    </h2>
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        padding: '2px 7px',
+                        borderRadius: 5,
+                        fontSize: 10.5,
+                        fontWeight: 600,
+                        letterSpacing: '0.02em',
+                        flexShrink: 0,
+                        ...roleSt,
+                      }}
+                    >
+                      {roleLabels[user.role] ?? user.role}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: 11, color: 'rgba(10,10,11,0.36)', fontFamily: 'monospace', marginTop: 3 }}>
+                    {user.phone}
+                  </p>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 12, color: 'rgba(10,10,11,0.50)' }}>
+                  {user.hourly_rate
+                    ? `R$ ${user.hourly_rate.toFixed(2).replace('.', ',')}/h`
+                    : 'Sem valor/hora'}
+                </span>
                 <span
-                  className={`w-1.5 h-1.5 rounded-full ${
-                    user.is_active ? 'bg-emerald-500' : 'bg-gray-300'
-                  }`}
-                />
-                {user.is_active ? 'Ativo' : 'Inativo'}
-              </span>
-            </div>
-          </button>
-        ))}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 5,
+                    fontSize: 11,
+                    color: user.is_active ? '#16A34A' : 'rgba(10,10,11,0.32)',
+                  }}
+                >
+                  <span
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: '50%',
+                      background: user.is_active ? '#16A34A' : 'rgba(10,10,11,0.20)',
+                    }}
+                  />
+                  {user.is_active ? 'Ativo' : 'Inativo'}
+                </span>
+              </div>
+            </button>
+          )
+        })}
 
         {users.length === 0 && (
-          <div className="col-span-3 text-center text-gray-400 py-10">Nenhum membro ativo.</div>
+          <div style={{ gridColumn: '1/-1', textAlign: 'center', color: 'rgba(10,10,11,0.32)', padding: '40px 20px', fontSize: 13 }}>
+            Nenhum membro ativo.
+          </div>
         )}
       </div>
 

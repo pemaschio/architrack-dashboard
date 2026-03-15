@@ -1,6 +1,8 @@
 'use client'
 
 import Link from 'next/link'
+import { Clock, FolderOpen, ClipboardList } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
 interface Props {
   totalHours: number
@@ -13,48 +15,84 @@ interface KpiCardProps {
   value: string
   subtext: string
   href?: string
+  icon: LucideIcon
+  accentColor?: string
 }
 
-function KpiCard({ label, value, subtext, href }: KpiCardProps) {
+function KpiCard({ label, value, subtext, href, icon: Icon, accentColor = '#B5614A' }: KpiCardProps) {
   const inner = (
     <div
       style={{
         background: '#ffffff',
-        borderRadius: 8,
-        padding: '20px 22px 18px',
-        boxShadow: '0 1px 2px rgba(0,0,0,0.06), 0 0 0 0.5px rgba(0,0,0,0.05)',
-        transition: 'box-shadow 0.15s ease',
+        borderRadius: 10,
+        padding: '22px 24px 20px',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04)',
+        transition: 'box-shadow 0.2s ease, transform 0.2s ease',
         cursor: href ? 'pointer' : 'default',
+        position: 'relative',
+        overflow: 'hidden',
       }}
       onMouseEnter={(e) => {
-        if (href)
-          (e.currentTarget as HTMLDivElement).style.boxShadow =
-            '0 2px 8px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.06)'
+        if (href) {
+          const el = e.currentTarget as HTMLDivElement
+          el.style.boxShadow = '0 4px 12px rgba(0,0,0,0.09), 0 0 0 1px rgba(0,0,0,0.05)'
+          el.style.transform = 'translateY(-1px)'
+        }
       }}
       onMouseLeave={(e) => {
-        if (href)
-          (e.currentTarget as HTMLDivElement).style.boxShadow =
-            '0 1px 2px rgba(0,0,0,0.06), 0 0 0 0.5px rgba(0,0,0,0.05)'
+        if (href) {
+          const el = e.currentTarget as HTMLDivElement
+          el.style.boxShadow = '0 1px 3px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04)'
+          el.style.transform = 'translateY(0)'
+        }
       }}
     >
-      {/* Label */}
+      {/* Accent bar */}
       <div
         style={{
-          fontSize: 10,
-          fontWeight: 500,
-          letterSpacing: '0.07em',
-          textTransform: 'uppercase',
-          color: 'rgba(10,10,11,0.38)',
-          marginBottom: 12,
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 2,
+          background: accentColor,
+          opacity: 0.6,
+          borderRadius: '10px 10px 0 0',
         }}
-      >
-        {label}
+      />
+
+      {/* Icon + Label row */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+        <div
+          style={{
+            fontSize: 10,
+            fontWeight: 600,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: 'rgba(10,10,11,0.38)',
+          }}
+        >
+          {label}
+        </div>
+        <div
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: 7,
+            background: `${accentColor}10`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Icon style={{ width: 14, height: 14, color: accentColor }} />
+        </div>
       </div>
 
       {/* Value */}
       <div
         style={{
-          fontSize: 42,
+          fontSize: 40,
           fontWeight: 300,
           letterSpacing: '-0.04em',
           lineHeight: 1,
@@ -70,8 +108,9 @@ function KpiCard({ label, value, subtext, href }: KpiCardProps) {
         style={{
           marginTop: 10,
           fontSize: 11,
-          color: 'rgba(10,10,11,0.32)',
+          color: 'rgba(10,10,11,0.34)',
           fontWeight: 400,
+          letterSpacing: '0.01em',
         }}
       >
         {subtext}
@@ -93,22 +132,28 @@ function KpiCard({ label, value, subtext, href }: KpiCardProps) {
 
 export function KpiCards({ totalHours, activeProjects, totalEntries }: Props) {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14 }}>
       <KpiCard
         label="Horas — 7 dias"
         value={`${totalHours}h`}
         subtext="Total de horas registradas"
+        icon={Clock}
+        accentColor="#B5614A"
       />
       <KpiCard
         label="Projetos ativos"
         value={String(activeProjects)}
         subtext="Em andamento agora"
         href="/projects"
+        icon={FolderOpen}
+        accentColor="#0066CC"
       />
       <KpiCard
         label="Registros — 7 dias"
         value={String(totalEntries)}
         subtext="Via WhatsApp e dashboard"
+        icon={ClipboardList}
+        accentColor="#16A34A"
       />
     </div>
   )
