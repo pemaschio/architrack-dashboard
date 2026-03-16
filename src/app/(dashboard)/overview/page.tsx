@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { KpiCards } from '@/components/overview/kpi-cards'
 import { OverviewClient } from '@/components/overview/overview-client'
+import { RefreshCw } from 'lucide-react'
 
 export default async function OverviewPage() {
   const supabase = createAdminClient()
@@ -45,23 +46,44 @@ export default async function OverviewPage() {
     .sort((a, b) => b.horas - a.horas)
     .slice(0, 10)
 
+  const now = new Date()
+  const dateStr = now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-        <h1
-          style={{
-            fontSize: 20,
-            fontWeight: 500,
-            letterSpacing: '-0.02em',
-            color: '#0A0A0B',
-            margin: 0,
-          }}
-        >
-          Painel
-        </h1>
-        <span style={{ fontSize: 11, color: 'rgba(10,10,11,0.36)', fontWeight: 400 }}>
-          Últimos 7 dias
-        </span>
+      {/* Page header */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+        <div>
+          <h1 style={{
+            fontSize: 22, fontWeight: 700, letterSpacing: '-0.025em',
+            color: '#0A0A0B', margin: 0, marginBottom: 4,
+          }}>
+            Painel
+          </h1>
+          <p style={{ fontSize: 12, color: 'rgba(10,10,11,0.40)', margin: 0, textTransform: 'capitalize' }}>
+            {dateStr} · últimos 7 dias
+          </p>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {/* Refresh hint */}
+          <form action="" method="get">
+            <button
+              type="submit"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                padding: '7px 13px', borderRadius: 8, cursor: 'pointer',
+                background: '#fff', border: '1px solid rgba(10,10,11,0.10)',
+                fontSize: 12, fontWeight: 500, color: 'rgba(10,10,11,0.55)',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                transition: 'all 0.15s',
+              }}
+            >
+              <RefreshCw style={{ width: 13, height: 13 }} />
+              Atualizar
+            </button>
+          </form>
+        </div>
       </div>
 
       <KpiCards

@@ -10,7 +10,6 @@ import {
   Users,
   Wallet,
   AlertTriangle,
-  TrendingUp,
   Layers,
   Building2,
   FileText,
@@ -19,19 +18,29 @@ import {
   PauseCircle,
   XCircle,
   Activity,
+  Edit3,
+  BarChart2,
+  ArrowRight,
+  Zap,
 } from 'lucide-react'
 import type { ProjectDetail } from '@/app/actions/details'
 
-const statusConfig: Record<
-  string,
-  { label: string; dot: string; badge: string; Icon: React.ElementType }
-> = {
-  active:    { label: 'Ativo',     dot: 'bg-emerald-500', badge: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200', Icon: Activity },
-  paused:    { label: 'Pausado',   dot: 'bg-amber-500',   badge: 'bg-amber-50 text-amber-700 ring-1 ring-amber-200',       Icon: PauseCircle },
-  completed: { label: 'Concluído', dot: 'bg-sky-500',     badge: 'bg-sky-50 text-sky-700 ring-1 ring-sky-200',             Icon: CheckCircle2 },
-  cancelled: { label: 'Cancelado', dot: 'bg-rose-500',    badge: 'bg-rose-50 text-rose-700 ring-1 ring-rose-200',          Icon: XCircle },
+/* ─── Status config ──────────────────────────────────────────────── */
+const STATUS: Record<string, {
+  label: string
+  accent: string
+  bg: string
+  text: string
+  ring: string
+  Icon: React.ElementType
+}> = {
+  active:    { label: 'Ativo',     accent: '#10b981', bg: '#ecfdf5', text: '#065f46', ring: '#a7f3d0', Icon: Activity },
+  paused:    { label: 'Pausado',   accent: '#f59e0b', bg: '#fffbeb', text: '#92400e', ring: '#fde68a', Icon: PauseCircle },
+  completed: { label: 'Concluído', accent: '#0ea5e9', bg: '#f0f9ff', text: '#075985', ring: '#bae6fd', Icon: CheckCircle2 },
+  cancelled: { label: 'Cancelado', accent: '#f43f5e', bg: '#fff1f2', text: '#9f1239', ring: '#fda4af', Icon: XCircle },
 }
 
+/* ─── Helpers ────────────────────────────────────────────────────── */
 function fmtMin(min: number) {
   if (min < 60) return `${min}min`
   const h = Math.floor(min / 60)
@@ -47,64 +56,104 @@ function fmtShortDate(iso: string) {
   return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
 }
 
-function daysUntilInfo(iso: string): { label: string; urgent: boolean; overdue: boolean } {
+function daysUntil(iso: string) {
   const diff = Math.ceil((new Date(iso).getTime() - Date.now()) / 86400000)
-  if (diff < 0) return { label: `${Math.abs(diff)} dias em atraso`, urgent: false, overdue: true }
-  if (diff === 0) return { label: 'Vence hoje', urgent: true, overdue: false }
-  if (diff === 1) return { label: 'Vence amanhã', urgent: true, overdue: false }
-  if (diff <= 7) return { label: `em ${diff} dias`, urgent: true, overdue: false }
-  return { label: `em ${diff} dias`, urgent: false, overdue: false }
+  if (diff < 0) return { label: `${Math.abs(diff)}d atraso`, urgent: false, overdue: true }
+  if (diff === 0) return { label: 'Hoje', urgent: true, overdue: false }
+  if (diff === 1) return { label: 'Amanhã', urgent: true, overdue: false }
+  if (diff <= 7) return { label: `${diff} dias`, urgent: true, overdue: false }
+  return { label: `${diff} dias`, urgent: false, overdue: false }
 }
 
 function initials(name: string) {
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
+  return name.split(' ').filter(Boolean).slice(0, 2).map((n) => n[0]).join('').toUpperCase()
 }
 
-const AVATAR_COLORS = [
-  'bg-violet-100 text-violet-700',
-  'bg-blue-100 text-blue-700',
-  'bg-emerald-100 text-emerald-700',
-  'bg-orange-100 text-orange-700',
-  'bg-rose-100 text-rose-700',
-  'bg-sky-100 text-sky-700',
-]
+const AVATAR_BG = ['#ede9fe', '#dbeafe', '#d1fae5', '#fed7aa', '#ffe4e6', '#e0f2fe']
+const AVATAR_FG = ['#5b21b6', '#1e40af', '#065f46', '#9a3412', '#9f1239', '#075985']
+const BAR_HEX   = ['#8b5cf6', '#3b82f6', '#10b981', '#f97316', '#f43f5e', '#0ea5e9']
 
-const BAR_COLORS = [
-  'bg-violet-400',
-  'bg-blue-400',
-  'bg-emerald-400',
-  'bg-orange-400',
-  'bg-rose-400',
-  'bg-sky-400',
-]
+/* ─── Circular gauge ─────────────────────────────────────────────── */
+interface GaugeProps { pct: number; isOver: boolean; isAlert: boolean; hours: number; budget: number }
 
-function avatarColor(index: number) {
-  return AVATAR_COLORS[index % AVATAR_COLORS.length]
+function CircularGauge({ pct, isOver, isAlert, hours, budget }: GaugeProps) {
+  const r = 48
+  const stroke = 9
+  const circ = 2 * Math.PI * r
+  const clampedPct = Math.min(pct, 100)
+  const dash = (clampedPct / 100) * circ
+  const trackColor = '#f3f4f6'
+  const fillColor = isOver ? '#ef4444' : isAlert ? '#f59e0b' : '#1d4ed8'
+
+  return (
+    <div style={{ position: 'relative', width: 120, height: 120 }}>
+      <svg width="120" height="120" viewBox="0 0 120 120">
+        {/* track */}
+        <circle cx="60" cy="60" r={r} fill="none" stroke={trackColor} strokeWidth={stroke} />
+        {/* progress arc */}
+        <circle
+          cx="60" cy="60" r={r}
+          fill="none"
+          stroke={fillColor}
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          strokeDasharray={`${dash} ${circ}`}
+          transform="rotate(-90 60 60)"
+          style={{ transition: 'stroke-dasharray 0.9s cubic-bezier(0.4,0,0.2,1)' }}
+        />
+        {/* inner glow ring */}
+        {pct >= 85 && (
+          <circle cx="60" cy="60" r={r - stroke / 2 - 2} fill="none"
+            stroke={fillColor} strokeWidth="1" strokeOpacity="0.15" />
+        )}
+      </svg>
+      {/* Center text */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      }}>
+        <span style={{ fontSize: 18, fontWeight: 800, lineHeight: 1, color: fillColor }}>{hours}h</span>
+        <span style={{ fontSize: 10, color: '#9ca3af', marginTop: 2 }}>de {budget}h</span>
+        <span style={{
+          fontSize: 11, fontWeight: 700, color: fillColor,
+          background: isOver ? '#fef2f2' : isAlert ? '#fffbeb' : '#eff6ff',
+          padding: '1px 5px', borderRadius: 999, marginTop: 4,
+        }}>{pct}%</span>
+      </div>
+    </div>
+  )
 }
 
-function barColor(index: number) {
-  return BAR_COLORS[index % BAR_COLORS.length]
+/* ─── Stacked team bar ───────────────────────────────────────────── */
+function TeamStackedBar({ team, totalMin }: { team: ProjectDetail['teamSummary']; totalMin: number }) {
+  return (
+    <div style={{ display: 'flex', height: 6, borderRadius: 999, overflow: 'hidden', background: '#f3f4f6', gap: 1 }}>
+      {team.map((m, i) => {
+        const w = totalMin > 0 ? (m.total_min / totalMin) * 100 : 0
+        return (
+          <div key={m.user_id}
+            title={`${m.user_name}: ${fmtMin(m.total_min)}`}
+            style={{ width: `${w}%`, background: BAR_HEX[i % BAR_HEX.length], minWidth: w > 0 ? 3 : 0 }}
+          />
+        )
+      })}
+    </div>
+  )
 }
 
+/* ─── Props ──────────────────────────────────────────────────────── */
 interface Props {
   project: ProjectDetail | null
   loading: boolean
   onClose: () => void
 }
 
+/* ─── Component ──────────────────────────────────────────────────── */
 export function ProjectDetailPanel({ project, loading, onClose }: Props) {
   const panelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose()
-    }
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
@@ -115,330 +164,562 @@ export function ProjectDetailPanel({ project, loading, onClose }: Props) {
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 z-40 bg-black/20 backdrop-blur-[1px] transition-opacity duration-300 ${
-          isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        }`}
+        className={`fixed inset-0 z-40 transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        style={{ background: 'rgba(15,23,42,0.35)', backdropFilter: 'blur(2px)' }}
         onClick={onClose}
       />
 
       {/* Panel */}
       <div
         ref={panelRef}
-        className={`fixed right-0 top-0 h-full z-50 w-full max-w-[440px] bg-white shadow-2xl transition-transform duration-300 ease-out flex flex-col ${
-          isVisible ? 'translate-x-0' : 'translate-x-full'
-        }`}
+        className={`fixed right-0 top-0 h-full z-50 flex flex-col transition-transform duration-300 ease-out ${isVisible ? 'translate-x-0' : 'translate-x-full'}`}
+        style={{ width: 460, background: '#fafafa', boxShadow: '-4px 0 40px rgba(0,0,0,0.12)' }}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 flex-shrink-0">
-          <span className="text-xs font-semibold tracking-[0.15em] uppercase text-gray-400">
-            Detalhes do Projeto
-          </span>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors text-gray-400 hover:text-gray-700"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto">
-          {loading && !project && (
-            <div className="flex items-center justify-center h-48">
-              <div className="flex gap-1.5">
+        {/* ── Loading ── */}
+        {loading && !project && (
+          <div className="flex-1 flex items-center justify-center">
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+              <div style={{ display: 'flex', gap: 6 }}>
                 {[0, 1, 2].map((i) => (
-                  <div
-                    key={i}
-                    className="w-2 h-2 rounded-full bg-gray-300 animate-bounce"
-                    style={{ animationDelay: `${i * 120}ms` }}
-                  />
+                  <div key={i} style={{
+                    width: 8, height: 8, borderRadius: '50%', background: '#1d4ed8',
+                    animation: 'bounce 1s infinite', animationDelay: `${i * 150}ms`,
+                  }} />
                 ))}
               </div>
+              <p style={{ fontSize: 12, color: '#9ca3af' }}>Carregando dados...</p>
             </div>
-          )}
+          </div>
+        )}
 
-          {project && (() => {
-            const totalHours = Math.round((project.totalMinutes / 60) * 10) / 10
-            const budgetH = project.budget_hours ?? 0
-            const pct = budgetH > 0 ? Math.min(Math.round((totalHours / budgetH) * 100), 100) : 0
-            const isAlertZone = budgetH > 0 && totalHours >= budgetH * (project.alert_threshold / 100)
-            const isOver = budgetH > 0 && totalHours >= budgetH
-            const remainingH = budgetH > 0 ? Math.max(Math.round((budgetH - totalHours) * 10) / 10, 0) : null
-            const s = statusConfig[project.status] ?? statusConfig.active
-            const StatusIcon = s.Icon
-            const deadlineInfo = project.deadline ? daysUntilInfo(project.deadline) : null
-            const maxTeamMin = project.teamSummary[0]?.total_min ?? 1
+        {/* ── Content ── */}
+        {project && (() => {
+          const totalHours = Math.round((project.totalMinutes / 60) * 10) / 10
+          const budgetH = project.budget_hours ?? 0
+          const pct = budgetH > 0 ? Math.min(Math.round((totalHours / budgetH) * 100), 100) : 0
+          const isAlert = budgetH > 0 && totalHours >= budgetH * (project.alert_threshold / 100)
+          const isOver = budgetH > 0 && totalHours >= budgetH
+          const remainingH = budgetH > 0 ? Math.max(Math.round((budgetH - totalHours) * 10) / 10, 0) : null
+          const s = STATUS[project.status] ?? STATUS.active
+          const StatusIcon = s.Icon
+          const deadlineInfo = project.deadline ? daysUntil(project.deadline) : null
+          const totalTeamMin = project.teamSummary.reduce((a, m) => a + m.total_min, 0)
 
-            return (
-              <>
-                {/* ── Identity ────────────────────────────────────── */}
-                <div className="px-6 pt-6 pb-5 border-b border-gray-100">
-                  {/* Badges row */}
-                  <div className="flex flex-wrap items-center gap-2 mb-3">
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold ${s.badge}`}>
-                      <StatusIcon className="w-3 h-3" />
-                      {s.label}
-                    </span>
-                    {project.phase_name && (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-gray-100 text-gray-600 ring-1 ring-gray-200">
-                        <Layers className="w-3 h-3" />
-                        {project.phase_name}
-                      </span>
-                    )}
-                  </div>
+          return (
+            <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: '#e5e7eb transparent' }}>
 
-                  {/* Project name */}
-                  <h2 className="text-xl font-bold text-gray-900 leading-tight mb-1">
-                    {project.name}
-                  </h2>
+              {/* ══ HEADER ══════════════════════════════════════════ */}
+              <div style={{ background: '#0f172a', padding: '20px 24px 0', position: 'relative', flexShrink: 0 }}>
+                {/* Status accent bar */}
+                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: s.accent }} />
 
-                  {/* Client */}
+                {/* Top row: label + actions */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                  <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', color: '#475569', textTransform: 'uppercase' }}>
+                    Painel do Projeto
+                  </span>
+                  <button
+                    onClick={onClose}
+                    style={{
+                      width: 28, height: 28, borderRadius: '50%', border: 'none', cursor: 'pointer',
+                      background: 'rgba(255,255,255,0.08)', color: '#94a3b8',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      transition: 'all 0.15s',
+                    }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.15)'; (e.currentTarget as HTMLElement).style.color = '#fff' }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.08)'; (e.currentTarget as HTMLElement).style.color = '#94a3b8' }}
+                  >
+                    <X style={{ width: 14, height: 14 }} />
+                  </button>
+                </div>
+
+                {/* Project name */}
+                <h2 style={{ fontSize: 20, fontWeight: 800, color: '#f8fafc', lineHeight: 1.2, marginBottom: 6 }}>
+                  {project.name}
+                </h2>
+
+                {/* Client + Phase row */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
                   {project.client_name && (
-                    <div className="flex items-center gap-1.5 text-sm text-gray-500">
-                      <Building2 className="w-3.5 h-3.5 flex-shrink-0" />
-                      <span>{project.client_name}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#94a3b8' }}>
+                      <Building2 style={{ width: 12, height: 12 }} />
+                      <span style={{ fontSize: 13 }}>{project.client_name}</span>
                     </div>
                   )}
-                </div>
-
-                {/* ── Quick stats ─────────────────────────────────── */}
-                <div className="px-6 py-4 border-b border-gray-100">
-                  <div className="grid grid-cols-3 gap-3">
-                    {/* Total hours */}
-                    <div className="bg-gray-50 rounded-xl p-3 text-center">
-                      <Clock className="w-4 h-4 text-gray-400 mx-auto mb-1" />
-                      <p className="text-base font-bold text-gray-900">{totalHours}h</p>
-                      <p className="text-[10px] text-gray-400 mt-0.5">Total horas</p>
-                    </div>
-                    {/* Entries count */}
-                    <div className="bg-gray-50 rounded-xl p-3 text-center">
-                      <FileText className="w-4 h-4 text-gray-400 mx-auto mb-1" />
-                      <p className="text-base font-bold text-gray-900">
-                        {project.recentEntries.length === 8 ? '8+' : project.recentEntries.length}
-                      </p>
-                      <p className="text-[10px] text-gray-400 mt-0.5">Lançamentos</p>
-                    </div>
-                    {/* Team size */}
-                    <div className="bg-gray-50 rounded-xl p-3 text-center">
-                      <Users className="w-4 h-4 text-gray-400 mx-auto mb-1" />
-                      <p className="text-base font-bold text-gray-900">{project.teamSummary.length}</p>
-                      <p className="text-[10px] text-gray-400 mt-0.5">Membros</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* ── Budget / Hours ───────────────────────────────── */}
-                <div className="px-6 py-5 border-b border-gray-100">
-                  <div className="flex items-center gap-2 mb-3">
-                    <TrendingUp className="w-4 h-4 text-gray-400" />
-                    <p className="text-xs font-semibold tracking-[0.12em] uppercase text-gray-400">
-                      Progresso de Horas
-                    </p>
-                  </div>
-
-                  {/* Alert banner */}
-                  {(isAlertZone || isOver) && budgetH > 0 && (
-                    <div className={`flex items-center gap-2 px-3 py-2 rounded-lg mb-3 text-xs font-medium ${
-                      isOver
-                        ? 'bg-rose-50 text-rose-700 ring-1 ring-rose-200'
-                        : 'bg-amber-50 text-amber-700 ring-1 ring-amber-200'
-                    }`}>
-                      <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
-                      {isOver
-                        ? `Orçamento esgotado (${pct}% consumido)`
-                        : `Alerta: ${pct}% do orçamento consumido (limite: ${project.alert_threshold}%)`}
-                    </div>
-                  )}
-
-                  {budgetH > 0 ? (
+                  {project.phase_name && (
                     <>
-                      <div className="flex justify-between items-baseline mb-2">
-                        <span className={`text-2xl font-bold ${isOver ? 'text-rose-600' : isAlertZone ? 'text-amber-600' : 'text-gray-900'}`}>
-                          {totalHours}h
-                        </span>
-                        <span className="text-sm text-gray-400">de {budgetH}h orçadas</span>
-                      </div>
-                      <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div
-                          className={`h-full rounded-full transition-all duration-700 ${
-                            isOver ? 'bg-rose-500' : isAlertZone ? 'bg-amber-500' : 'bg-gray-800'
-                          }`}
-                          style={{ width: `${pct}%` }}
-                        />
-                      </div>
-                      <div className="flex justify-between mt-1.5">
-                        <span className={`text-xs font-semibold ${isOver ? 'text-rose-600' : isAlertZone ? 'text-amber-600' : 'text-gray-500'}`}>
-                          {pct}% usado
-                        </span>
-                        {remainingH !== null && remainingH > 0 && (
-                          <span className="text-xs text-gray-400">{remainingH}h restantes</span>
-                        )}
+                      <span style={{ color: '#334155', fontSize: 12 }}>·</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#64748b' }}>
+                        <Layers style={{ width: 12, height: 12 }} />
+                        <span style={{ fontSize: 13 }}>{project.phase_name}</span>
                       </div>
                     </>
-                  ) : (
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-2xl font-bold text-gray-900">{totalHours}h</span>
-                      <span className="text-sm text-gray-400">registradas</span>
-                    </div>
-                  )}
-
-                  {/* Budget value */}
-                  {project.budget_value && (
-                    <div className="mt-3 pt-3 border-t border-gray-100 flex items-center gap-2">
-                      <Wallet className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-                      <span className="text-xs text-gray-500 flex-1">Valor orçado</span>
-                      <span className="text-sm font-bold text-gray-800">
-                        R$ {project.budget_value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                      </span>
-                    </div>
                   )}
                 </div>
 
-                {/* ── Dates ────────────────────────────────────────── */}
-                {(project.start_date || project.deadline) && (
-                  <div className="px-6 py-5 border-b border-gray-100">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Calendar className="w-4 h-4 text-gray-400" />
-                      <p className="text-xs font-semibold tracking-[0.12em] uppercase text-gray-400">
-                        Datas
-                      </p>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      {project.start_date && (
-                        <div className="bg-gray-50 rounded-xl px-4 py-3">
-                          <div className="flex items-center gap-1.5 mb-1">
-                            <CalendarCheck className="w-3.5 h-3.5 text-gray-400" />
-                            <p className="text-xs text-gray-400">Início</p>
-                          </div>
-                          <p className="text-sm font-semibold text-gray-800">
-                            {fmtDate(project.start_date)}
-                          </p>
-                        </div>
-                      )}
-                      {project.deadline && deadlineInfo && (
-                        <div className={`rounded-xl px-4 py-3 ${
-                          deadlineInfo.overdue
-                            ? 'bg-rose-50 ring-1 ring-rose-200'
-                            : deadlineInfo.urgent
-                            ? 'bg-amber-50 ring-1 ring-amber-200'
-                            : 'bg-gray-50'
-                        }`}>
-                          <div className="flex items-center gap-1.5 mb-1">
-                            <CalendarClock className={`w-3.5 h-3.5 ${
-                              deadlineInfo.overdue ? 'text-rose-500' : deadlineInfo.urgent ? 'text-amber-500' : 'text-gray-400'
-                            }`} />
-                            <p className={`text-xs ${
-                              deadlineInfo.overdue ? 'text-rose-500' : deadlineInfo.urgent ? 'text-amber-500' : 'text-gray-400'
-                            }`}>Prazo</p>
-                          </div>
-                          <p className={`text-sm font-semibold ${
-                            deadlineInfo.overdue ? 'text-rose-700' : deadlineInfo.urgent ? 'text-amber-700' : 'text-gray-800'
-                          }`}>
-                            {fmtDate(project.deadline)}
-                          </p>
-                          <p className={`text-xs mt-0.5 font-medium ${
-                            deadlineInfo.overdue ? 'text-rose-600' : deadlineInfo.urgent ? 'text-amber-600' : 'text-gray-400'
-                          }`}>
-                            {deadlineInfo.label}
-                          </p>
-                        </div>
-                      )}
-                    </div>
+                {/* Status badge + Action buttons */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingBottom: 20 }}>
+                  <span style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 5,
+                    padding: '4px 10px', borderRadius: 999,
+                    background: s.bg, color: s.text,
+                    fontSize: 11, fontWeight: 700,
+                    border: `1px solid ${s.ring}`,
+                  }}>
+                    <StatusIcon style={{ width: 11, height: 11 }} />
+                    {s.label}
+                  </span>
+
+                  <div style={{ flex: 1 }} />
+
+                  <ActionButton icon={<Edit3 style={{ width: 11, height: 11 }} />} label="Editar" />
+                  <ActionButton icon={<BarChart2 style={{ width: 11, height: 11 }} />} label="Relatório" />
+                </div>
+              </div>
+
+              {/* ══ QUICK STATS ══════════════════════════════════════ */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 1, background: '#e2e8f0', borderBottom: '1px solid #e2e8f0' }}>
+                <StatCard icon={<Clock style={{ width: 14, height: 14, color: '#1d4ed8' }} />}
+                  value={`${totalHours}h`} label="Horas" bg="#fff" accent="#1d4ed8" />
+                <StatCard icon={<FileText style={{ width: 14, height: 14, color: '#7c3aed' }} />}
+                  value={project.recentEntries.length >= 8 ? '8+' : String(project.recentEntries.length)}
+                  label="Lançamentos" bg="#fff" accent="#7c3aed" />
+                <StatCard icon={<Users style={{ width: 14, height: 14, color: '#0891b2' }} />}
+                  value={String(project.teamSummary.length)} label="Membros" bg="#fff" accent="#0891b2" />
+              </div>
+
+              {/* ══ BUDGET GAUGE ═════════════════════════════════════ */}
+              <div style={{ background: '#fff', padding: '24px', borderBottom: '1px solid #f1f5f9' }}>
+                <SectionLabel icon={<Zap style={{ width: 12, height: 12 }} />} label="Consumo de Horas" />
+
+                {/* Alert banner */}
+                {(isAlert || isOver) && budgetH > 0 && (
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    padding: '8px 12px', borderRadius: 8, marginBottom: 16,
+                    background: isOver ? '#fef2f2' : '#fffbeb',
+                    border: `1px solid ${isOver ? '#fca5a5' : '#fde68a'}`,
+                    fontSize: 12, fontWeight: 600,
+                    color: isOver ? '#dc2626' : '#d97706',
+                  }}>
+                    <AlertTriangle style={{ width: 13, height: 13, flexShrink: 0 }} />
+                    {isOver
+                      ? `Orçamento esgotado — ${pct}% consumido`
+                      : `Alerta: ${pct}% consumido (limite ${project.alert_threshold}%)`}
                   </div>
                 )}
 
-                {/* ── Team ─────────────────────────────────────────── */}
-                {project.teamSummary.length > 0 && (
-                  <div className="px-6 py-5 border-b border-gray-100">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Users className="w-4 h-4 text-gray-400" />
-                      <p className="text-xs font-semibold tracking-[0.12em] uppercase text-gray-400">
-                        Equipe
-                      </p>
+                {budgetH > 0 ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+                    {/* Gauge */}
+                    <CircularGauge
+                      pct={pct} isOver={isOver} isAlert={isAlert}
+                      hours={totalHours} budget={budgetH}
+                    />
+
+                    {/* Right side info */}
+                    <div style={{ flex: 1 }}>
+                      <div style={{ marginBottom: 12 }}>
+                        <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 2 }}>Horas utilizadas</p>
+                        <p style={{ fontSize: 22, fontWeight: 800, color: isOver ? '#dc2626' : isAlert ? '#d97706' : '#111827', lineHeight: 1 }}>
+                          {totalHours}h
+                        </p>
+                        <p style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>de {budgetH}h orçadas</p>
+                      </div>
+
+                      {remainingH !== null && remainingH > 0 && (
+                        <div style={{
+                          display: 'inline-flex', alignItems: 'center', gap: 6,
+                          padding: '5px 10px', borderRadius: 8,
+                          background: '#f0fdf4', border: '1px solid #bbf7d0',
+                          fontSize: 12, fontWeight: 600, color: '#15803d',
+                        }}>
+                          <Clock style={{ width: 11, height: 11 }} />
+                          {remainingH}h restantes
+                        </div>
+                      )}
+
+                      {isOver && (
+                        <div style={{
+                          display: 'inline-flex', alignItems: 'center', gap: 6,
+                          padding: '5px 10px', borderRadius: 8,
+                          background: '#fef2f2', border: '1px solid #fca5a5',
+                          fontSize: 12, fontWeight: 600, color: '#dc2626',
+                        }}>
+                          <AlertTriangle style={{ width: 11, height: 11 }} />
+                          {Math.abs(remainingH ?? 0)}h excedido
+                        </div>
+                      )}
+
+                      {project.budget_value && (
+                        <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <Wallet style={{ width: 12, height: 12, color: '#9ca3af' }} />
+                          <span style={{ fontSize: 12, color: '#6b7280' }}>Valor:</span>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>
+                            R$ {project.budget_value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          </span>
+                        </div>
+                      )}
                     </div>
-                    <div className="space-y-3">
-                      {project.teamSummary.map((m, idx) => {
-                        const memberPct = Math.round((m.total_min / maxTeamMin) * 100)
+                  </div>
+                ) : (
+                  /* No budget — just show hours */
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                    <span style={{ fontSize: 36, fontWeight: 800, color: '#111827', lineHeight: 1 }}>{totalHours}</span>
+                    <span style={{ fontSize: 15, color: '#6b7280' }}>horas registradas</span>
+                  </div>
+                )}
+              </div>
+
+              {/* ══ DATES ════════════════════════════════════════════ */}
+              {(project.start_date || project.deadline) && (
+                <div style={{ background: '#fff', padding: '20px 24px', borderBottom: '1px solid #f1f5f9' }}>
+                  <SectionLabel icon={<Calendar style={{ width: 12, height: 12 }} />} label="Cronograma" />
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                    {project.start_date && (
+                      <div style={{
+                        padding: '12px 14px', borderRadius: 10,
+                        background: '#f8fafc', border: '1px solid #e2e8f0',
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                          <CalendarCheck style={{ width: 12, height: 12, color: '#10b981' }} />
+                          <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#6b7280' }}>Início</span>
+                        </div>
+                        <p style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>{fmtDate(project.start_date)}</p>
+                      </div>
+                    )}
+                    {project.deadline && deadlineInfo && (
+                      <div style={{
+                        padding: '12px 14px', borderRadius: 10,
+                        background: deadlineInfo.overdue ? '#fef2f2' : deadlineInfo.urgent ? '#fffbeb' : '#f8fafc',
+                        border: `1px solid ${deadlineInfo.overdue ? '#fca5a5' : deadlineInfo.urgent ? '#fde68a' : '#e2e8f0'}`,
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                          <CalendarClock style={{
+                            width: 12, height: 12,
+                            color: deadlineInfo.overdue ? '#dc2626' : deadlineInfo.urgent ? '#d97706' : '#6b7280'
+                          }} />
+                          <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#6b7280' }}>Prazo</span>
+                        </div>
+                        <p style={{ fontSize: 13, fontWeight: 600, color: deadlineInfo.overdue ? '#dc2626' : deadlineInfo.urgent ? '#92400e' : '#111827' }}>
+                          {fmtDate(project.deadline)}
+                        </p>
+                        <div style={{
+                          marginTop: 5, display: 'inline-flex', alignItems: 'center',
+                          padding: '2px 7px', borderRadius: 999,
+                          background: deadlineInfo.overdue ? '#dc2626' : deadlineInfo.urgent ? '#f59e0b' : '#e2e8f0',
+                          fontSize: 10, fontWeight: 700,
+                          color: deadlineInfo.overdue || deadlineInfo.urgent ? '#fff' : '#6b7280',
+                        }}>
+                          {deadlineInfo.label}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* ══ TEAM ══════════════════════════════════════════════ */}
+              {project.teamSummary.length > 0 && (
+                <div style={{ background: '#fff', padding: '20px 24px', borderBottom: '1px solid #f1f5f9' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                    <SectionLabel icon={<Users style={{ width: 12, height: 12 }} />} label="Equipe" />
+                    {/* Avatar stack */}
+                    <div style={{ display: 'flex', gap: -4 }}>
+                      {project.teamSummary.slice(0, 4).map((m, i) => (
+                        <div key={m.user_id} style={{
+                          width: 24, height: 24, borderRadius: '50%',
+                          background: AVATAR_BG[i % AVATAR_BG.length],
+                          color: AVATAR_FG[i % AVATAR_FG.length],
+                          fontSize: 9, fontWeight: 800,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          border: '2px solid #fff',
+                          marginLeft: i > 0 ? -6 : 0,
+                          zIndex: project.teamSummary.length - i,
+                          position: 'relative',
+                        }}>
+                          {initials(m.user_name)}
+                        </div>
+                      ))}
+                      {project.teamSummary.length > 4 && (
+                        <div style={{
+                          width: 24, height: 24, borderRadius: '50%',
+                          background: '#f1f5f9', color: '#64748b',
+                          fontSize: 9, fontWeight: 700,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          border: '2px solid #fff', marginLeft: -6, position: 'relative',
+                        }}>
+                          +{project.teamSummary.length - 4}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Stacked distribution bar */}
+                  <div style={{ marginBottom: 16 }}>
+                    <TeamStackedBar team={project.teamSummary} totalMin={totalTeamMin} />
+                    {/* Legend */}
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 12px', marginTop: 8 }}>
+                      {project.teamSummary.map((m, i) => {
+                        const pctMember = totalTeamMin > 0 ? Math.round((m.total_min / totalTeamMin) * 100) : 0
                         return (
-                          <div key={m.user_id}>
-                            <div className="flex items-center gap-3 mb-1">
-                              <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold ${avatarColor(idx)}`}>
-                                {initials(m.user_name)}
-                              </div>
-                              <span className="text-sm text-gray-700 flex-1 truncate">{m.user_name}</span>
-                              <span className="text-xs font-semibold text-gray-600 tabular-nums">
-                                {fmtMin(m.total_min)}
-                              </span>
-                            </div>
-                            <div className="ml-10 h-1 bg-gray-100 rounded-full overflow-hidden">
-                              <div
-                                className={`h-full rounded-full ${barColor(idx)}`}
-                                style={{ width: `${memberPct}%` }}
-                              />
-                            </div>
+                          <div key={m.user_id} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <div style={{ width: 8, height: 8, borderRadius: 2, background: BAR_HEX[i % BAR_HEX.length], flexShrink: 0 }} />
+                            <span style={{ fontSize: 10, color: '#6b7280' }}>{m.user_name.split(' ')[0]} ({pctMember}%)</span>
                           </div>
                         )
                       })}
                     </div>
                   </div>
-                )}
 
-                {/* ── Recent entries ───────────────────────────────── */}
-                <div className="px-6 py-5">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Timer className="w-4 h-4 text-gray-400" />
-                    <p className="text-xs font-semibold tracking-[0.12em] uppercase text-gray-400">
-                      Últimos Lançamentos
-                    </p>
-                  </div>
-
-                  {project.recentEntries.length > 0 ? (
-                    <div className="space-y-px">
-                      {project.recentEntries.map((e) => (
-                        <div
-                          key={e.id}
-                          className="flex items-start justify-between py-2.5 border-b border-gray-50 last:border-0"
-                        >
-                          <div className="flex items-start gap-2 flex-1 min-w-0">
-                            <div className="w-1.5 h-1.5 rounded-full bg-gray-300 mt-1.5 flex-shrink-0" />
-                            <div className="min-w-0">
-                              <p className="text-sm text-gray-800 truncate">
-                                {e.description || '(sem descrição)'}
-                              </p>
-                              <p className="text-xs text-gray-400 mt-0.5">{e.user_name ?? '—'}</p>
+                  {/* Member list */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {project.teamSummary.map((m, idx) => {
+                      const memberPct = totalTeamMin > 0 ? (m.total_min / totalTeamMin) * 100 : 0
+                      return (
+                        <div key={m.user_id} style={{
+                          display: 'flex', alignItems: 'center', gap: 10,
+                          padding: '8px 12px', borderRadius: 10,
+                          background: '#f8fafc', border: '1px solid #f1f5f9',
+                        }}>
+                          {/* Avatar */}
+                          <div style={{
+                            width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+                            background: AVATAR_BG[idx % AVATAR_BG.length],
+                            color: AVATAR_FG[idx % AVATAR_FG.length],
+                            fontSize: 11, fontWeight: 800,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          }}>
+                            {initials(m.user_name)}
+                          </div>
+                          {/* Info */}
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{ fontSize: 13, fontWeight: 600, color: '#111827', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {m.user_name}
+                            </p>
+                            {/* Mini progress bar */}
+                            <div style={{ height: 3, background: '#e2e8f0', borderRadius: 999, overflow: 'hidden' }}>
+                              <div style={{
+                                height: '100%', borderRadius: 999,
+                                background: BAR_HEX[idx % BAR_HEX.length],
+                                width: `${memberPct}%`,
+                                transition: 'width 0.6s ease',
+                              }} />
                             </div>
                           </div>
-                          <div className="text-right ml-3 flex-shrink-0">
-                            <p className="text-sm font-semibold text-gray-700 tabular-nums">
-                              {e.duration_min ? fmtMin(e.duration_min) : '—'}
-                            </p>
-                            <p className="text-xs text-gray-400 mt-0.5">
-                              {fmtShortDate(e.started_at)}
-                            </p>
+                          {/* Hours + % */}
+                          <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                            <p style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{fmtMin(m.total_min)}</p>
+                            <p style={{ fontSize: 10, color: '#9ca3af' }}>{Math.round(memberPct)}%</p>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="py-8 text-center">
-                      <FileText className="w-8 h-8 text-gray-200 mx-auto mb-2" />
-                      <p className="text-sm text-gray-400">Nenhum lançamento encontrado.</p>
-                    </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* ══ RECENT ENTRIES ════════════════════════════════════ */}
+              <div style={{ background: '#fff', padding: '20px 24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                  <SectionLabel icon={<Timer style={{ width: 12, height: 12 }} />} label="Últimos Lançamentos" />
+                  {project.recentEntries.length > 0 && (
+                    <span style={{ fontSize: 11, color: '#9ca3af' }}>
+                      {project.recentEntries.length >= 8 ? 'Últimos 8' : `${project.recentEntries.length} total`}
+                    </span>
                   )}
                 </div>
 
-                {/* ── Footer ────────────────────────────────────────── */}
-                <div className="px-6 py-4 border-t border-gray-100 flex items-center gap-1.5 flex-shrink-0">
-                  <Calendar className="w-3.5 h-3.5 text-gray-300" />
-                  <p className="text-xs text-gray-400">
-                    Criado em {fmtDate(project.created_at)}
-                  </p>
+                {project.recentEntries.length > 0 ? (
+                  <div style={{ position: 'relative' }}>
+                    {/* Vertical timeline line */}
+                    <div style={{
+                      position: 'absolute', left: 9, top: 8, bottom: 8, width: 1,
+                      background: 'linear-gradient(to bottom, #e2e8f0, transparent)',
+                    }} />
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      {project.recentEntries.map((e, i) => (
+                        <div key={e.id} style={{
+                          display: 'flex', gap: 14, alignItems: 'flex-start',
+                          padding: '8px 0',
+                          borderBottom: i < project.recentEntries.length - 1 ? '1px solid #f8fafc' : 'none',
+                        }}>
+                          {/* Timeline dot */}
+                          <div style={{
+                            width: 18, height: 18, borderRadius: '50%', flexShrink: 0,
+                            background: i === 0 ? '#1d4ed8' : '#f1f5f9',
+                            border: `2px solid ${i === 0 ? '#bfdbfe' : '#e2e8f0'}`,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            zIndex: 1, position: 'relative',
+                          }}>
+                            {i === 0 && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }} />}
+                          </div>
+
+                          {/* Content */}
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{
+                              fontSize: 13, color: '#374151', lineHeight: 1.4,
+                              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                            }}>
+                              {e.description || <span style={{ color: '#9ca3af', fontStyle: 'italic' }}>sem descrição</span>}
+                            </p>
+                            <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>
+                              {e.user_name ?? '—'}  ·  {fmtShortDate(e.started_at)}
+                            </p>
+                          </div>
+
+                          {/* Duration pill */}
+                          {e.duration_min && (
+                            <div style={{
+                              flexShrink: 0, padding: '3px 8px', borderRadius: 999,
+                              background: '#f0f9ff', border: '1px solid #bae6fd',
+                              fontSize: 11, fontWeight: 700, color: '#0369a1',
+                              whiteSpace: 'nowrap',
+                            }}>
+                              {fmtMin(e.duration_min)}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ padding: '32px 0', textAlign: 'center' }}>
+                    <FileText style={{ width: 32, height: 32, color: '#e2e8f0', margin: '0 auto 8px' }} />
+                    <p style={{ fontSize: 13, color: '#9ca3af' }}>Nenhum lançamento registrado.</p>
+                  </div>
+                )}
+              </div>
+
+              {/* ══ FOOTER CTA ════════════════════════════════════════ */}
+              <div style={{
+                padding: '16px 24px', background: '#f8fafc',
+                borderTop: '1px solid #e2e8f0',
+                display: 'flex', flexDirection: 'column', gap: 8,
+              }}>
+                <button
+                  style={{
+                    width: '100%', padding: '10px 16px',
+                    background: '#0f172a', color: '#fff',
+                    border: 'none', borderRadius: 10, cursor: 'pointer',
+                    fontSize: 13, fontWeight: 600,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                    transition: 'all 0.15s',
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.background = '#1e293b')}
+                  onMouseLeave={e => (e.currentTarget.style.background = '#0f172a')}
+                >
+                  <BarChart2 style={{ width: 14, height: 14 }} />
+                  Ver relatório completo
+                  <ArrowRight style={{ width: 13, height: 13 }} />
+                </button>
+
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button
+                    style={{
+                      flex: 1, padding: '8px 14px',
+                      background: '#fff', color: '#374151',
+                      border: '1px solid #e2e8f0', borderRadius: 10, cursor: 'pointer',
+                      fontSize: 12, fontWeight: 600,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                      transition: 'all 0.15s',
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.borderColor = '#cbd5e1')}
+                    onMouseLeave={e => (e.currentTarget.style.borderColor = '#e2e8f0')}
+                  >
+                    <Edit3 style={{ width: 12, height: 12 }} />
+                    Editar Projeto
+                  </button>
+                  <button
+                    style={{
+                      flex: 1, padding: '8px 14px',
+                      background: '#fff', color: '#374151',
+                      border: '1px solid #e2e8f0', borderRadius: 10, cursor: 'pointer',
+                      fontSize: 12, fontWeight: 600,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                      transition: 'all 0.15s',
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.borderColor = '#cbd5e1')}
+                    onMouseLeave={e => (e.currentTarget.style.borderColor = '#e2e8f0')}
+                  >
+                    <Timer style={{ width: 12, height: 12 }} />
+                    Novo Lançamento
+                  </button>
                 </div>
-              </>
-            )
-          })()}
-        </div>
+
+                {/* Created at */}
+                <p style={{ fontSize: 11, color: '#9ca3af', textAlign: 'center', marginTop: 2 }}>
+                  Criado em {fmtDate(project.created_at)}
+                </p>
+              </div>
+
+            </div>
+          )
+        })()}
       </div>
     </>
+  )
+}
+
+/* ─── Micro components ───────────────────────────────────────────── */
+function ActionButton({ icon, label }: { icon: React.ReactNode; label: string }) {
+  return (
+    <button
+      style={{
+        display: 'flex', alignItems: 'center', gap: 5,
+        padding: '5px 10px', borderRadius: 7,
+        background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)',
+        color: '#94a3b8', fontSize: 11, fontWeight: 600, cursor: 'pointer',
+        transition: 'all 0.15s',
+      }}
+      onMouseEnter={e => {
+        e.currentTarget.style.background = 'rgba(255,255,255,0.15)'
+        e.currentTarget.style.color = '#e2e8f0'
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.background = 'rgba(255,255,255,0.08)'
+        e.currentTarget.style.color = '#94a3b8'
+      }}
+    >
+      {icon}
+      {label}
+    </button>
+  )
+}
+
+function StatCard({ icon, value, label, bg, accent }: {
+  icon: React.ReactNode
+  value: string
+  label: string
+  bg: string
+  accent: string
+}) {
+  return (
+    <div style={{
+      background: bg, padding: '16px 12px', textAlign: 'center',
+      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+    }}>
+      <div style={{
+        width: 32, height: 32, borderRadius: 8, marginBottom: 2,
+        background: `${accent}15`,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>
+        {icon}
+      </div>
+      <p style={{ fontSize: 20, fontWeight: 800, color: '#111827', lineHeight: 1 }}>{value}</p>
+      <p style={{ fontSize: 10, color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</p>
+    </div>
+  )
+}
+
+function SectionLabel({ icon, label }: { icon: React.ReactNode; label: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 14 }}>
+      <div style={{ color: '#6b7280' }}>{icon}</div>
+      <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#6b7280' }}>
+        {label}
+      </p>
+    </div>
   )
 }
