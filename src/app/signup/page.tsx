@@ -1,14 +1,8 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
-import { LoginForm } from '@/components/auth/login-form'
+import { SignupForm } from '@/components/auth/signup-form'
 
-export default async function LoginPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ error?: string }>
-}) {
-  const params = await searchParams
-
+export default function SignupPage() {
   return (
     <div
       style={{
@@ -39,9 +33,18 @@ export default async function LoginPage({
               boxShadow: '0 4px 14px rgba(181,97,74,0.30)',
             }}
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 20h9"/>
-              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 20h9" />
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
             </svg>
           </div>
           <h1
@@ -71,19 +74,23 @@ export default async function LoginPage({
         </div>
 
         <Suspense fallback={null}>
-          <LoginForm />
+          <SignupForm />
         </Suspense>
 
-        {params.error === 'pending_confirmation' && (
-          <p style={{ textAlign: 'center', fontSize: 12, color: '#DC2626', marginTop: 12 }}>
-            Sua conta ainda não foi confirmada. Verifique seu e-mail.
-          </p>
-        )}
-
-        <p style={{ textAlign: 'center', marginTop: 20, fontSize: 12, color: 'rgba(10,10,11,0.40)' }}>
-          Ainda não tem conta?{' '}
-          <Link href="/signup" style={{ color: '#B5614A', fontWeight: 500, textDecoration: 'none' }}>
-            Criar conta
+        <p
+          style={{
+            textAlign: 'center',
+            marginTop: 20,
+            fontSize: 12,
+            color: 'rgba(10,10,11,0.40)',
+          }}
+        >
+          Já tem conta?{' '}
+          <Link
+            href="/login"
+            style={{ color: '#B5614A', fontWeight: 500, textDecoration: 'none' }}
+          >
+            Entrar
           </Link>
         </p>
       </div>
