@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   X,
   Clock,
@@ -151,12 +152,27 @@ interface Props {
 /* ─── Component ──────────────────────────────────────────────────── */
 export function ProjectDetailPanel({ project, loading, onClose }: Props) {
   const panelRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
+
+  const handleEdit = useCallback(() => {
+    onClose()
+    router.push('/settings/projects' as never)
+  }, [onClose, router])
+
+  const handlePrint = useCallback(() => {
+    window.print()
+  }, [])
+
+  const handleNewEntry = useCallback(() => {
+    // Abre WhatsApp para registrar nova entrada via chat
+    window.open('https://wa.me/5511936200716', '_blank')
+  }, [])
 
   const isVisible = loading || project !== null
 
@@ -272,8 +288,8 @@ export function ProjectDetailPanel({ project, loading, onClose }: Props) {
 
                   <div style={{ flex: 1 }} />
 
-                  <ActionButton icon={<Edit3 style={{ width: 11, height: 11 }} />} label="Editar" />
-                  <ActionButton icon={<BarChart2 style={{ width: 11, height: 11 }} />} label="Relatório" />
+                  <ActionButton icon={<Edit3 style={{ width: 11, height: 11 }} />} label="Editar" onClick={handleEdit} />
+                  <ActionButton icon={<BarChart2 style={{ width: 11, height: 11 }} />} label="Relatório" onClick={handlePrint} />
                 </div>
               </div>
 
@@ -599,6 +615,7 @@ export function ProjectDetailPanel({ project, loading, onClose }: Props) {
                 display: 'flex', flexDirection: 'column', gap: 8,
               }}>
                 <button
+                  onClick={handlePrint}
                   style={{
                     width: '100%', padding: '10px 16px',
                     background: '#0f172a', color: '#fff',
@@ -617,6 +634,7 @@ export function ProjectDetailPanel({ project, loading, onClose }: Props) {
 
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button
+                    onClick={handleEdit}
                     style={{
                       flex: 1, padding: '8px 14px',
                       background: '#fff', color: '#374151',
@@ -632,6 +650,7 @@ export function ProjectDetailPanel({ project, loading, onClose }: Props) {
                     Editar Projeto
                   </button>
                   <button
+                    onClick={handleNewEntry}
                     style={{
                       flex: 1, padding: '8px 14px',
                       background: '#fff', color: '#374151',
@@ -663,9 +682,10 @@ export function ProjectDetailPanel({ project, loading, onClose }: Props) {
 }
 
 /* ─── Micro components ───────────────────────────────────────────── */
-function ActionButton({ icon, label }: { icon: React.ReactNode; label: string }) {
+function ActionButton({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick?: () => void }) {
   return (
     <button
+      onClick={onClick}
       style={{
         display: 'flex', alignItems: 'center', gap: 5,
         padding: '5px 10px', borderRadius: 7,
