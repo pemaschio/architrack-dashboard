@@ -1,9 +1,8 @@
 'use server'
 
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
+import { getAuthUserRecord } from '@/lib/supabase/get-auth-user'
 import { revalidatePath } from 'next/cache'
-
-const ORG_ID = '00000000-0000-0000-0000-000000000001'
 
 export interface EntryFormData {
   users: { id: string; name: string }[]
@@ -12,7 +11,7 @@ export interface EntryFormData {
 }
 
 export async function fetchEntryFormData(): Promise<EntryFormData> {
-  const supabase = createAdminClient()
+  const supabase = await createClient()
 
   const [{ data: users }, { data: projects }, { data: activityTypes }] = await Promise.all([
     supabase
@@ -29,7 +28,6 @@ export async function fetchEntryFormData(): Promise<EntryFormData> {
     supabase
       .from('activity_types')
       .select('id, name')
-      .eq('org_id', ORG_ID)
       .order('name'),
   ])
 
@@ -61,10 +59,11 @@ export async function createTimeEntry(
   const startedAt = new Date(`${date}T12:00:00`)
 
   try {
-    const supabase = createAdminClient()
+    const authUser = await getAuthUserRecord()
+    const supabase = await createClient()
 
     const { error } = await supabase.from('time_entries').insert({
-      org_id: ORG_ID,
+      org_id: authUser.org_id,
       user_id: userId,
       project_id: projectId,
       activity_type_id: activityTypeId || null,

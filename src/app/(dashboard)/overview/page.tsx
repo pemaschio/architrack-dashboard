@@ -1,10 +1,10 @@
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 import { KpiCards } from '@/components/overview/kpi-cards'
 import { OverviewClient } from '@/components/overview/overview-client'
 import { RefreshCw } from 'lucide-react'
 
 export default async function OverviewPage() {
-  const supabase = createAdminClient()
+  const supabase = await createClient()
 
   const weekStart = new Date()
   weekStart.setDate(weekStart.getDate() - 7)

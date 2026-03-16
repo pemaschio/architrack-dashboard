@@ -1,9 +1,9 @@
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 import { UserCardList } from '@/components/team/user-card-list'
 import { AddUserDialog } from '@/components/settings/add-user-dialog'
 
 export default async function TeamPage() {
-  const supabase = createAdminClient()
+  const supabase = await createClient()
 
   const { data: users } = await supabase
     .from('users')

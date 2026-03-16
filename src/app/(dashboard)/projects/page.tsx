@@ -1,10 +1,10 @@
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 import { ProjectsTable } from '@/components/projects/projects-table'
 import { AddProjectDialog } from '@/components/settings/add-project-dialog'
 import { FolderOpen } from 'lucide-react'
 
 export default async function ProjectsPage() {
-  const supabase = createAdminClient()
+  const supabase = await createClient()
 
   const [{ data: projects }, { data: phases }] = await Promise.all([
     supabase

@@ -1,9 +1,8 @@
 'use server'
 
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
+import { getAuthUserRecord } from '@/lib/supabase/get-auth-user'
 import { revalidatePath } from 'next/cache'
-
-const ORG_ID = '00000000-0000-0000-0000-000000000001'
 
 export async function createProject(
   formData: FormData,
@@ -22,10 +21,11 @@ export async function createProject(
   const deadline = formData.get('deadline') as string
 
   try {
-    const supabase = createAdminClient()
+    const authUser = await getAuthUserRecord()
+    const supabase = await createClient()
 
     const { error } = await supabase.from('projects').insert({
-      org_id: ORG_ID,
+      org_id: authUser.org_id,
       name: name.trim(),
       client_name: (formData.get('client_name') as string)?.trim() || null,
       status: (formData.get('status') as string) || 'active',

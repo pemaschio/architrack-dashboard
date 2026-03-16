@@ -1,6 +1,6 @@
 'use server'
 
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 
 export interface UserDetail {
   id: string
@@ -54,7 +54,7 @@ export interface ProjectDetail {
 }
 
 export async function fetchUserDetail(userId: string): Promise<UserDetail | null> {
-  const supabase = createAdminClient()
+  const supabase = await createClient()
 
   const [{ data: user }, { data: entries }] = await Promise.all([
     supabase
@@ -115,7 +115,7 @@ export async function fetchUserDetail(userId: string): Promise<UserDetail | null
 }
 
 export async function fetchProjectDetail(projectId: string): Promise<ProjectDetail | null> {
-  const supabase = createAdminClient()
+  const supabase = await createClient()
 
   const [{ data: project }, { data: entries }] = await Promise.all([
     supabase

@@ -7,6 +7,7 @@ export function AddUserDialog() {
   const [open, setOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const [selectedRole, setSelectedRole] = useState('architect')
   const formRef = useRef<HTMLFormElement>(null)
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -17,12 +18,15 @@ export function AddUserDialog() {
       try {
         await createUser(formData)
         setOpen(false)
+        setSelectedRole('architect')
         formRef.current?.reset()
       } catch (err) {
         setError((err as Error).message)
       }
     })
   }
+
+  const needsEmail = selectedRole === 'director' || selectedRole === 'admin'
 
   return (
     <>
@@ -42,8 +46,8 @@ export function AddUserDialog() {
           <div className="relative bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
             <h2 className="text-lg font-semibold text-gray-900 mb-1">Adicionar Membro</h2>
             <p className="text-sm text-gray-500 mb-5">
-              O membro será criado como inativo. Ele será ativado automaticamente ao enviar a
-              primeira mensagem pelo WhatsApp.
+              Arquitetos são ativados via WhatsApp. Diretores e admins recebem um convite por
+              e-mail para acessar o dashboard.
             </p>
 
             <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
@@ -80,6 +84,7 @@ export function AddUserDialog() {
                   name="role"
                   required
                   defaultValue="architect"
+                  onChange={(e) => setSelectedRole(e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 bg-white"
                 >
                   <option value="architect">Arquiteto</option>
@@ -87,6 +92,24 @@ export function AddUserDialog() {
                   <option value="admin">Admin</option>
                 </select>
               </div>
+
+              {needsEmail && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    E-mail <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    name="email"
+                    type="email"
+                    required={needsEmail}
+                    placeholder="carlos@exemplo.com"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">
+                    Um convite de acesso ao dashboard será enviado para este e-mail.
+                  </p>
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
