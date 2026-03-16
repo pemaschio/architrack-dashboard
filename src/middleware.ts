@@ -29,19 +29,41 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const isAuthRoute = request.nextUrl.pathname.startsWith('/login')
+  const { pathname } = request.nextUrl
+  const isAuthRoute =
+    pathname.startsWith('/login') || pathname.startsWith('/signup')
   const isDashboardRoute =
-    request.nextUrl.pathname.startsWith('/overview') ||
-    request.nextUrl.pathname.startsWith('/projects') ||
-    request.nextUrl.pathname.startsWith('/settings') ||
-    request.nextUrl.pathname.startsWith('/team')
+    pathname.startsWith('/overview') ||
+    pathname.startsWith('/projects') ||
+    pathname.startsWith('/settings') ||
+    pathname.startsWith('/team')
 
+  // Unauthenticated user trying to access dashboard → login
   if (!user && isDashboardRoute) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
+  // Authenticated user on auth route → dashboard
   if (user && isAuthRoute) {
     return NextResponse.redirect(new URL('/overview', request.url))
+  }
+
+  // Authenticated user on dashboard → verify public.users record exists
+  // Uses auth_id (FK column), NOT users.id (own PK)
+  if (user && isDashboardRoute) {
+    const { data: userRecord } = await supabase
+      .from('users')
+      .select('id')
+      .eq('auth_id', user.id)
+      .single()
+
+    if (!userRecord) {
+      // Sign out first to clear session cookie and prevent redirect loop
+      await supabase.auth.signOut()
+      return NextResponse.redirect(
+        new URL('/login?error=pending_confirmation', request.url)
+      )
+    }
   }
 
   return supabaseResponse
