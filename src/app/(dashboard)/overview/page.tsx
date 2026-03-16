@@ -10,7 +10,12 @@ export default async function OverviewPage() {
   weekStart.setDate(weekStart.getDate() - 7)
   weekStart.setHours(0, 0, 0, 0)
 
-  const [{ data: timeEntries }, { data: projects }] = await Promise.all([
+  const [
+    { data: timeEntries },
+    { data: projectsRaw },
+    { data: allTimeEntries },
+  ] = await Promise.all([
+    // 7-day entries for the table
     supabase
       .from('time_entries')
       .select(`
@@ -24,27 +29,41 @@ export default async function OverviewPage() {
       .order('started_at', { ascending: false })
       .limit(100),
 
+    // Active projects with full budget data
     supabase
       .from('projects')
-      .select('id, name')
+      .select('id, name, client_name, status, budget_hours, budget_value, alert_threshold')
       .eq('status', 'active')
       .eq('is_deleted', false),
+
+    // All-time entries for project consumption (project_id + duration only)
+    supabase
+      .from('time_entries')
+      .select('project_id, duration_min')
+      .eq('is_deleted', false)
+      .not('project_id', 'is', null),
   ])
 
-  const totalMinutes =
-    timeEntries?.reduce((sum, e) => sum + (e.duration_min || 0), 0) || 0
-  const totalHours = Math.round((totalMinutes / 60) * 10) / 10
-
-  const hoursByProject: Record<string, number> = {}
-  for (const entry of timeEntries || []) {
-    const name = (entry.projects as unknown as { name: string } | null)?.name ?? 'Sem projeto'
-    hoursByProject[name] = (hoursByProject[name] || 0) + (entry.duration_min || 0) / 60
+  // Aggregate all-time minutes per project_id
+  const minutesByProjectId: Record<string, number> = {}
+  for (const e of allTimeEntries || []) {
+    if (e.project_id) {
+      minutesByProjectId[e.project_id] = (minutesByProjectId[e.project_id] || 0) + (e.duration_min || 0)
+    }
   }
 
-  const chartData = Object.entries(hoursByProject)
-    .map(([name, hours]) => ({ name, horas: Math.round(hours * 10) / 10 }))
-    .sort((a, b) => b.horas - a.horas)
-    .slice(0, 10)
+  const projectsWithStats = (projectsRaw || []).map((p) => ({
+    id: p.id,
+    name: p.name,
+    client_name: p.client_name,
+    budget_hours: p.budget_hours,
+    budget_value: p.budget_value,
+    alert_threshold: p.alert_threshold ?? 80,
+    total_minutes: minutesByProjectId[p.id] || 0,
+  }))
+
+  const totalMinutes = timeEntries?.reduce((sum, e) => sum + (e.duration_min || 0), 0) || 0
+  const totalHours = Math.round((totalMinutes / 60) * 10) / 10
 
   const now = new Date()
   const dateStr = now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
@@ -66,7 +85,6 @@ export default async function OverviewPage() {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {/* Refresh hint */}
           <form action="" method="get">
             <button
               type="submit"
@@ -88,12 +106,12 @@ export default async function OverviewPage() {
 
       <KpiCards
         totalHours={totalHours}
-        activeProjects={projects?.length || 0}
+        activeProjects={projectsWithStats.length}
         totalEntries={timeEntries?.length || 0}
       />
 
       {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-      <OverviewClient chartData={chartData} entries={(timeEntries || []) as any} />
+      <OverviewClient entries={(timeEntries || []) as any} projectsWithStats={projectsWithStats} />
     </div>
   )
 }
