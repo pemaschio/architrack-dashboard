@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { NewEntryDialog } from './new-entry-dialog'
 import {
   X,
   Clock,
@@ -153,6 +154,7 @@ interface Props {
 export function ProjectDetailPanel({ project, loading, onClose }: Props) {
   const panelRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
+  const [entryDialogOpen, setEntryDialogOpen] = useState(false)
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
@@ -170,8 +172,7 @@ export function ProjectDetailPanel({ project, loading, onClose }: Props) {
   }, [])
 
   const handleNewEntry = useCallback(() => {
-    // Abre WhatsApp para registrar nova entrada via chat
-    window.open('https://wa.me/5511936200716', '_blank')
+    setEntryDialogOpen(true)
   }, [])
 
   const isVisible = loading || project !== null
@@ -183,6 +184,14 @@ export function ProjectDetailPanel({ project, loading, onClose }: Props) {
         className={`fixed inset-0 z-40 transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         style={{ background: 'rgba(15,23,42,0.35)', backdropFilter: 'blur(2px)' }}
         onClick={onClose}
+      />
+
+      {/* New Entry Dialog — sobrepõe o painel */}
+      <NewEntryDialog
+        open={entryDialogOpen}
+        onClose={() => setEntryDialogOpen(false)}
+        defaultProjectId={project?.id}
+        defaultProjectName={project?.name}
       />
 
       {/* Panel */}
