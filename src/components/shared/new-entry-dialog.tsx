@@ -12,27 +12,6 @@ interface Props {
   defaultProjectName?: string
 }
 
-const INPUT = {
-  width: '100%',
-  border: '1px solid #e2e8f0',
-  borderRadius: 8,
-  padding: '8px 12px',
-  fontSize: 13,
-  color: '#111827',
-  background: '#fff',
-  outline: 'none',
-  boxSizing: 'border-box' as const,
-  transition: 'border-color 0.15s',
-}
-
-const LABEL = {
-  display: 'block',
-  fontSize: 12,
-  fontWeight: 600,
-  color: '#374151',
-  marginBottom: 5,
-}
-
 export function NewEntryDialog({ open, onClose, defaultProjectId, defaultProjectName }: Props) {
   const [formData, setFormData] = useState<EntryFormData | null>(null)
   const [loadingData, setLoadingData] = useState(false)
@@ -78,44 +57,27 @@ export function NewEntryDialog({ open, onClose, defaultProjectId, defaultProject
   if (!open) return null
 
   return (
-    <div style={{
-      position: 'fixed', inset: 0, zIndex: 60,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-    }}>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center">
       {/* Backdrop */}
       <div
-        style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.45)', backdropFilter: 'blur(2px)' }}
+        className="absolute inset-0 glass-backdrop"
         onClick={() => !isPending && onClose()}
       />
 
       {/* Modal */}
-      <div style={{
-        position: 'relative', background: '#fff', borderRadius: 16,
-        width: '100%', maxWidth: 520, margin: '0 16px',
-        boxShadow: '0 24px 64px rgba(0,0,0,0.20)',
-        overflow: 'hidden', maxHeight: '90vh', display: 'flex', flexDirection: 'column',
-      }}>
+      <div className="relative glass-modal w-full max-w-[520px] mx-4 max-h-[90vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div style={{
-          padding: '18px 22px 16px',
-          borderBottom: '1px solid #f1f5f9',
-          display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
-          flexShrink: 0,
-        }}>
+        <div className="px-[22px] pt-[18px] pb-4 flex items-start justify-between shrink-0">
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
-              <div style={{
-                width: 32, height: 32, borderRadius: 9,
-                background: 'rgba(29,78,216,0.10)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <Clock style={{ width: 16, height: 16, color: '#1d4ed8' }} />
+            <div className="flex items-center gap-2 mb-[3px]">
+              <div className="w-8 h-8 rounded-[9px] bg-blue-700/10 flex items-center justify-center">
+                <Clock className="w-4 h-4 text-blue-700" />
               </div>
-              <h2 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', margin: 0 }}>
+              <h2 className="text-base font-bold text-slate-900">
                 Novo Lançamento
               </h2>
             </div>
-            <p style={{ fontSize: 12, color: '#94a3b8', margin: 0, marginLeft: 40 }}>
+            <p className="text-xs text-stone-400 ml-10">
               {defaultProjectName
                 ? `Registrando horas em: ${defaultProjectName}`
                 : 'Registre horas trabalhadas diretamente pelo dashboard'}
@@ -124,53 +86,45 @@ export function NewEntryDialog({ open, onClose, defaultProjectId, defaultProject
           <button
             onClick={onClose}
             disabled={isPending}
-            style={{
-              width: 30, height: 30, borderRadius: '50%', border: 'none', cursor: 'pointer',
-              background: '#f1f5f9', color: '#64748b',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              transition: 'all 0.15s', flexShrink: 0,
-            }}
+            className="w-[30px] h-[30px] rounded-full bg-stone-300/15 text-stone-500 flex items-center justify-center transition-colors hover:bg-stone-300/25 border-none cursor-pointer shrink-0"
           >
-            <X style={{ width: 14, height: 14 }} />
+            <X className="w-3.5 h-3.5" />
           </button>
         </div>
 
+        {/* Gradient divider */}
+        <div className="gradient-divider" />
+
         {/* Body */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '20px 22px' }}>
+        <div className="flex-1 overflow-y-auto px-[22px] py-5">
           {/* Loading state */}
           {loadingData && (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 160, gap: 10, color: '#94a3b8' }}>
-              <Loader2 style={{ width: 18, height: 18, animation: 'spin 1s linear infinite' }} />
-              <span style={{ fontSize: 13 }}>Carregando dados...</span>
+            <div className="flex items-center justify-center h-40 gap-2.5 text-stone-400">
+              <Loader2 className="w-[18px] h-[18px] animate-spin" />
+              <span className="text-[13px]">Carregando dados...</span>
             </div>
           )}
 
           {/* Success state */}
           {success && (
-            <div style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center',
-              justifyContent: 'center', height: 160, gap: 10,
-            }}>
-              <CheckCircle2 style={{ width: 40, height: 40, color: '#16a34a' }} />
-              <p style={{ fontSize: 15, fontWeight: 600, color: '#111827' }}>Lançamento registrado!</p>
-              <p style={{ fontSize: 12, color: '#94a3b8' }}>O dashboard será atualizado automaticamente.</p>
+            <div className="flex flex-col items-center justify-center h-40 gap-2.5">
+              <CheckCircle2 className="w-10 h-10 text-green-600" />
+              <p className="text-[15px] font-semibold text-gray-900">Lançamento registrado!</p>
+              <p className="text-xs text-stone-400">O dashboard será atualizado automaticamente.</p>
             </div>
           )}
 
           {/* Form */}
           {!loadingData && !success && formData && (
             <form ref={formRef} onSubmit={handleSubmit}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div className="flex flex-col gap-4">
 
                 {/* Arquiteto */}
                 <div>
-                  <label style={LABEL}>
-                    Arquiteto <span style={{ color: '#ef4444' }}>*</span>
+                  <label className="block text-xs font-semibold text-stone-500 mb-1.5">
+                    Arquiteto <span className="text-red-500">*</span>
                   </label>
-                  <select name="user_id" required style={INPUT}
-                    onFocus={e => (e.target.style.borderColor = '#1d4ed8')}
-                    onBlur={e => (e.target.style.borderColor = '#e2e8f0')}
-                  >
+                  <select name="user_id" required className="w-full px-3 py-2 text-[13px] text-stone-900 font-sans glass-input">
                     <option value="">— Selecione —</option>
                     {formData.users.map((u) => (
                       <option key={u.id} value={u.id}>{u.name}</option>
@@ -180,16 +134,14 @@ export function NewEntryDialog({ open, onClose, defaultProjectId, defaultProject
 
                 {/* Projeto */}
                 <div>
-                  <label style={LABEL}>
-                    Projeto <span style={{ color: '#ef4444' }}>*</span>
+                  <label className="block text-xs font-semibold text-stone-500 mb-1.5">
+                    Projeto <span className="text-red-500">*</span>
                   </label>
                   <select
                     name="project_id"
                     required
                     defaultValue={defaultProjectId || ''}
-                    style={INPUT}
-                    onFocus={e => (e.target.style.borderColor = '#1d4ed8')}
-                    onBlur={e => (e.target.style.borderColor = '#e2e8f0')}
+                    className="w-full px-3 py-2 text-[13px] text-stone-900 font-sans glass-input"
                   >
                     <option value="">— Selecione —</option>
                     {formData.projects.map((p) => (
@@ -201,12 +153,10 @@ export function NewEntryDialog({ open, onClose, defaultProjectId, defaultProject
                 {/* Tipo de atividade */}
                 {formData.activityTypes.length > 0 && (
                   <div>
-                    <label style={LABEL}>Tipo de atividade</label>
+                    <label className="block text-xs font-semibold text-stone-500 mb-1.5">Tipo de atividade</label>
                     <select
                       name="activity_type_id"
-                      style={INPUT}
-                      onFocus={e => (e.target.style.borderColor = '#1d4ed8')}
-                      onBlur={e => (e.target.style.borderColor = '#e2e8f0')}
+                      className="w-full px-3 py-2 text-[13px] text-stone-900 font-sans glass-input"
                     >
                       <option value="">— Sem tipo —</option>
                       {formData.activityTypes.map((a) => (
@@ -218,27 +168,25 @@ export function NewEntryDialog({ open, onClose, defaultProjectId, defaultProject
 
                 {/* Data */}
                 <div>
-                  <label style={LABEL}>
-                    Data <span style={{ color: '#ef4444' }}>*</span>
+                  <label className="block text-xs font-semibold text-stone-500 mb-1.5">
+                    Data <span className="text-red-500">*</span>
                   </label>
                   <input
                     name="date"
                     type="date"
                     required
                     defaultValue={today}
-                    style={INPUT}
-                    onFocus={e => (e.target.style.borderColor = '#1d4ed8')}
-                    onBlur={e => (e.target.style.borderColor = '#e2e8f0')}
+                    className="w-full px-3 py-2 text-[13px] text-stone-900 font-sans glass-input"
                   />
                 </div>
 
                 {/* Duração */}
                 <div>
-                  <label style={LABEL}>
-                    Duração <span style={{ color: '#ef4444' }}>*</span>
+                  <label className="block text-xs font-semibold text-stone-500 mb-1.5">
+                    Duração <span className="text-red-500">*</span>
                   </label>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                    <div style={{ position: 'relative' }}>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <div className="relative">
                       <input
                         name="hours"
                         type="number"
@@ -246,16 +194,11 @@ export function NewEntryDialog({ open, onClose, defaultProjectId, defaultProject
                         max="23"
                         defaultValue="1"
                         placeholder="0"
-                        style={{ ...INPUT, paddingRight: 36 }}
-                        onFocus={e => (e.target.style.borderColor = '#1d4ed8')}
-                        onBlur={e => (e.target.style.borderColor = '#e2e8f0')}
+                        className="w-full px-3 py-2 pr-9 text-[13px] text-stone-900 font-sans glass-input"
                       />
-                      <span style={{
-                        position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
-                        fontSize: 11, fontWeight: 600, color: '#94a3b8', pointerEvents: 'none',
-                      }}>h</span>
+                      <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-stone-400 pointer-events-none">h</span>
                     </div>
-                    <div style={{ position: 'relative' }}>
+                    <div className="relative">
                       <input
                         name="minutes"
                         type="number"
@@ -263,73 +206,48 @@ export function NewEntryDialog({ open, onClose, defaultProjectId, defaultProject
                         max="59"
                         defaultValue="0"
                         placeholder="0"
-                        style={{ ...INPUT, paddingRight: 40 }}
-                        onFocus={e => (e.target.style.borderColor = '#1d4ed8')}
-                        onBlur={e => (e.target.style.borderColor = '#e2e8f0')}
+                        className="w-full px-3 py-2 pr-10 text-[13px] text-stone-900 font-sans glass-input"
                       />
-                      <span style={{
-                        position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
-                        fontSize: 11, fontWeight: 600, color: '#94a3b8', pointerEvents: 'none',
-                      }}>min</span>
+                      <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-stone-400 pointer-events-none">min</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Descrição */}
                 <div>
-                  <label style={LABEL}>Descrição</label>
+                  <label className="block text-xs font-semibold text-stone-500 mb-1.5">Descrição</label>
                   <textarea
                     name="description"
                     placeholder="Ex: Detalhamento de cozinha, revisão de projeto..."
                     rows={3}
-                    style={{
-                      ...INPUT, resize: 'vertical', fontFamily: 'inherit', lineHeight: 1.5,
-                    }}
-                    onFocus={e => (e.target.style.borderColor = '#1d4ed8')}
-                    onBlur={e => (e.target.style.borderColor = '#e2e8f0')}
+                    className="w-full px-3 py-2 text-[13px] text-stone-900 font-sans glass-input resize-y leading-relaxed"
                   />
                 </div>
 
                 {/* Error */}
                 {error && (
-                  <div style={{
-                    display: 'flex', alignItems: 'center', gap: 8,
-                    padding: '10px 12px', borderRadius: 8,
-                    background: '#fef2f2', border: '1px solid #fca5a5',
-                    fontSize: 13, color: '#dc2626',
-                  }}>
-                    <AlertCircle style={{ width: 14, height: 14, flexShrink: 0 }} />
+                  <div className="flex items-center gap-2 p-2.5 px-3 rounded-lg bg-red-500/[0.08] border border-red-200 text-[13px] text-red-600">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                     {error}
                   </div>
                 )}
 
                 {/* Actions */}
-                <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', paddingTop: 4 }}>
+                <div className="flex gap-2.5 justify-end pt-1">
                   <button
                     type="button"
                     onClick={onClose}
                     disabled={isPending}
-                    style={{
-                      padding: '9px 18px', borderRadius: 9, border: '1px solid #e2e8f0',
-                      background: '#fff', color: '#374151',
-                      fontSize: 13, fontWeight: 600, cursor: 'pointer',
-                      transition: 'all 0.15s',
-                    }}
+                    className="px-[18px] py-[9px] rounded-[9px] glass glass-hover text-[13px] font-semibold text-stone-500 border-none cursor-pointer"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
                     disabled={isPending}
-                    style={{
-                      padding: '9px 22px', borderRadius: 9, border: 'none',
-                      background: isPending ? '#93c5fd' : '#1d4ed8', color: '#fff',
-                      fontSize: 13, fontWeight: 600, cursor: isPending ? 'not-allowed' : 'pointer',
-                      display: 'flex', alignItems: 'center', gap: 7,
-                      transition: 'all 0.15s',
-                    }}
+                    className="px-[22px] py-[9px] rounded-[9px] bg-stone-900 text-white text-[13px] font-semibold border-none cursor-pointer transition-colors hover:bg-[#292524] disabled:opacity-50 flex items-center gap-[7px]"
                   >
-                    {isPending && <Loader2 style={{ width: 13, height: 13, animation: 'spin 1s linear infinite' }} />}
+                    {isPending && <Loader2 className="w-[13px] h-[13px] animate-spin" />}
                     {isPending ? 'Salvando...' : 'Registrar horas'}
                   </button>
                 </div>
@@ -338,8 +256,6 @@ export function NewEntryDialog({ open, onClose, defaultProjectId, defaultProject
           )}
         </div>
       </div>
-
-      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   )
 }
