@@ -4,27 +4,26 @@
 
 @layer base {
   :root {
-    /* shadcn tokens — tuned for ArchiTrack palette */
-    --background: 36 8% 96%;
-    --foreground: 0 0% 4%;
+    --background: 40 8% 91%;
+    --foreground: 0 0% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 4%;
+    --card-foreground: 0 0% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 4%;
+    --popover-foreground: 0 0% 11%;
     --primary: 16 40% 50%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 36 8% 94%;
+    --secondary: 30 5% 80%;
     --secondary-foreground: 0 0% 20%;
-    --muted: 36 8% 94%;
-    --muted-foreground: 0 0% 44%;
-    --accent: 36 8% 94%;
+    --muted: 30 5% 80%;
+    --muted-foreground: 25 5% 47%;
+    --accent: 30 5% 80%;
     --accent-foreground: 0 0% 20%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 36 8% 88%;
-    --input: 36 8% 88%;
+    --border: 30 8% 66%;
+    --input: 30 8% 66%;
     --ring: 16 40% 50%;
-    --radius: 0.5rem;
+    --radius: 0.75rem;
   }
 }
 
@@ -33,16 +32,13 @@
     @apply border-border;
     box-sizing: border-box;
   }
-
   body {
-    background-color: #F4F2EF;
-    color: #0A0A0B;
+    background-color: #EAEAE5;
+    color: #1C1C1C;
     font-feature-settings: 'cv11', 'ss01';
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-
-  /* Remove table-specific border defaults */
   table {
     border-collapse: collapse;
   }
@@ -54,54 +50,113 @@
 }
 
 @layer utilities {
-  /* KPI number treatment — refined elegance */
-  .kpi-num {
+  /* Glass Surfaces */
+  .glass {
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(168,162,158,0.3);
+    border-radius: 12px;
+  }
+  .glass-hover:hover {
+    background: rgba(255,255,255,0.72);
+    border-color: rgba(168,162,158,0.5);
+  }
+  .glass-dark {
+    background: rgba(28,28,28,0.94);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .glass-modal {
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(168,162,158,0.35);
+    border-radius: 16px;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.12);
+  }
+  .glass-backdrop {
+    background: rgba(234,234,229,0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .glass-input {
+    background: rgba(255,255,255,0.4);
+    border: 1px solid rgba(168,162,158,0.3);
+    border-radius: 8px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .glass-input:focus {
+    border-color: #78716c;
+    box-shadow: 0 0 0 3px rgba(120,113,108,0.10);
+    outline: none;
+  }
+  .glass-input-terra:focus {
+    border-color: #B5614A;
+    box-shadow: 0 0 0 3px rgba(181,97,74,0.10);
+    outline: none;
+  }
+  .glass-row:hover {
+    background: rgba(255,255,255,0.3);
+  }
+
+  /* Gradient Accents */
+  .accent-terra { background: linear-gradient(90deg, #B5614A, transparent); }
+  .accent-stone-500 { background: linear-gradient(90deg, #78716c, transparent); }
+  .accent-stone-400 { background: linear-gradient(90deg, #a8a29e, transparent); }
+  .gradient-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(168,162,158,0.3) 20%, rgba(168,162,158,0.3) 80%, transparent);
+  }
+
+  /* Typography */
+  .text-page-title {
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    color: #1C1C1C;
+  }
+  .text-section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1C1C1C;
+  }
+  .text-kpi {
+    font-size: 32px;
     font-weight: 300;
     letter-spacing: -0.04em;
     line-height: 1;
+    color: #1C1C1C;
     font-variant-numeric: tabular-nums;
   }
-
-  /* Surface card — elevated card style */
-  .card-surface {
-    background: #ffffff;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07), 0 0 0 1px rgba(0, 0, 0, 0.04);
-    border-radius: 10px;
+  .text-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #78716c;
+  }
+  .text-meta {
+    font-size: 11px;
+    font-weight: 500;
+    color: #a8a29e;
   }
 
-  /* Card hover elevation */
-  .card-surface-hover:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.09), 0 0 0 1px rgba(0, 0, 0, 0.05);
-  }
+  /* Ink Scale */
+  .ink { color: #1C1C1C; }
+  .ink-60 { color: rgba(28,28,28,0.60); }
+  .ink-40 { color: rgba(28,28,28,0.40); }
+  .ink-24 { color: rgba(28,28,28,0.24); }
 
-  /* Ink scale */
-  .ink     { color: #0A0A0B; }
-  .ink-60  { color: rgba(10, 10, 11, 0.60); }
-  .ink-40  { color: rgba(10, 10, 11, 0.40); }
-  .ink-24  { color: rgba(10, 10, 11, 0.24); }
-
-  /* Terra — brand accent */
+  /* Brand */
   .text-terra { color: #B5614A; }
-  .bg-terra-subtle { background-color: rgba(181, 97, 74, 0.08); }
+  .bg-terra { background-color: #B5614A; }
+  .bg-terra-subtle { background-color: rgba(181,97,74,0.10); }
 
-  /* System accent — sparingly */
-  .text-sys-blue { color: #0066CC; }
-  .bg-sys-blue-subtle { background-color: rgba(0, 102, 204, 0.07); }
-
-  /* Table rows */
-  .row-hover:hover {
-    background-color: rgba(10, 10, 11, 0.025);
-    transition: background-color 0.1s ease;
-  }
-
-  /* Sidebar nav item active */
-  .nav-active {
-    background-color: rgba(10, 10, 11, 0.06);
-  }
-
-  /* Skeleton loading */
+  /* Skeleton */
   .skeleton {
-    background: linear-gradient(90deg, #ede9e4 25%, #e4dfd9 50%, #ede9e4 75%);
+    background: linear-gradient(90deg, #e4dfda 25%, #dbd5cf 50%, #e4dfda 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
     border-radius: 4px;
