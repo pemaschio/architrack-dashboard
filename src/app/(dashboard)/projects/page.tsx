@@ -38,40 +38,29 @@ export default async function ProjectsPage() {
   const totalCount = projectsWithHours.length
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+    <div className="flex flex-col gap-5">
       {/* Page header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+      <div className="flex items-start justify-between">
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-            <h1 style={{
-              fontSize: 22, fontWeight: 700, letterSpacing: '-0.025em',
-              color: '#0A0A0B', margin: 0,
-            }}>
+          <div className="flex items-center gap-2.5 mb-1">
+            <h1 className="text-page-title">
               Projetos
             </h1>
             {/* Count badges */}
-            <span style={{
-              display: 'inline-flex', alignItems: 'center', gap: 4,
-              padding: '2px 8px', borderRadius: 999,
-              background: '#dcfce7', color: '#15803d',
-              fontSize: 11, fontWeight: 700,
-            }}>
-              <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#16A34A', display: 'inline-block' }} />
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-600/[0.08] text-green-700 text-[11px] font-bold">
+              <span className="inline-block w-[5px] h-[5px] rounded-full" style={{ background: '#16A34A' }} />
               {activeCount} ativos
             </span>
-            <span style={{
-              fontSize: 11, fontWeight: 600, color: 'rgba(10,10,11,0.38)',
-              padding: '2px 7px', background: 'rgba(10,10,11,0.05)', borderRadius: 999,
-            }}>
+            <span className="text-[11px] font-semibold text-stone-400 px-[7px] py-0.5 bg-stone-300/15 rounded-full">
               {totalCount} total
             </span>
           </div>
-          <p style={{ fontSize: 12, color: 'rgba(10,10,11,0.40)', margin: 0 }}>
+          <p className="text-xs text-stone-400">
             Clique em um projeto para ver os detalhes
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div className="flex items-center gap-2">
           <AddProjectDialog phases={phases || []} />
         </div>
       </div>
@@ -80,13 +69,10 @@ export default async function ProjectsPage() {
 
       {/* Empty state hint */}
       {projectsWithHours.length === 0 && (
-        <div style={{
-          display: 'flex', flexDirection: 'column', alignItems: 'center',
-          gap: 12, padding: '60px 20px', textAlign: 'center',
-        }}>
-          <FolderOpen style={{ width: 40, height: 40, color: '#e2e8f0' }} />
-          <p style={{ fontSize: 15, fontWeight: 600, color: '#374151' }}>Nenhum projeto ainda</p>
-          <p style={{ fontSize: 13, color: '#9ca3af' }}>Crie seu primeiro projeto usando o botão acima.</p>
+        <div className="flex flex-col items-center gap-3 py-[60px] px-5 text-center">
+          <FolderOpen className="w-10 h-10 text-slate-200" />
+          <p className="text-[15px] font-semibold text-gray-700">Nenhum projeto ainda</p>
+          <p className="text-[13px] text-gray-400">Crie seu primeiro projeto usando o botão acima.</p>
         </div>
       )}
     </div>
