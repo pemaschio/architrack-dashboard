@@ -82,50 +82,16 @@ export function SignupForm() {
 
   if (sent) {
     return (
-      <div
-        style={{
-          background: '#fff',
-          borderRadius: 12,
-          boxShadow: '0 1px 3px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04)',
-          padding: '36px 28px',
-          textAlign: 'center',
-        }}
-      >
-        <div
-          style={{
-            width: 48,
-            height: 48,
-            borderRadius: 14,
-            background: 'rgba(181,97,74,0.10)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 16px',
-          }}
-        >
-          <MailCheck style={{ width: 22, height: 22, color: '#B5614A' }} />
+      <div className="glass-modal p-9 text-center">
+        <div className="w-12 h-12 rounded-[14px] bg-terra/10 flex items-center justify-center mx-auto mb-4">
+          <MailCheck className="w-[22px] h-[22px] text-terra" />
         </div>
-        <h2
-          style={{
-            fontSize: 15,
-            fontWeight: 600,
-            color: '#0A0A0B',
-            marginBottom: 8,
-            letterSpacing: '-0.015em',
-          }}
-        >
+        <h2 className="text-[15px] font-semibold text-stone-900 mb-2 tracking-[-0.015em]">
           Verifique seu e-mail!
         </h2>
-        <p
-          style={{
-            fontSize: 13,
-            color: 'rgba(10,10,11,0.50)',
-            lineHeight: 1.65,
-            margin: 0,
-          }}
-        >
+        <p className="text-[13px] text-stone-400 leading-[1.65] m-0">
           Enviamos um link de confirmação para{' '}
-          <strong style={{ color: '#0A0A0B', fontWeight: 500 }}>
+          <strong className="text-stone-900 font-medium">
             {form.email}
           </strong>
           . Confirme seu e-mail para ativar a conta.
@@ -135,17 +101,7 @@ export function SignupForm() {
             setSent(false)
             setError(null)
           }}
-          style={{
-            marginTop: 20,
-            fontSize: 12,
-            color: '#B5614A',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            fontFamily: 'inherit',
-            fontWeight: 500,
-            letterSpacing: '0.01em',
-          }}
+          className="mt-5 text-xs text-terra bg-transparent border-none cursor-pointer font-sans font-medium tracking-[0.01em]"
         >
           Usar outro e-mail
         </button>
@@ -153,80 +109,18 @@ export function SignupForm() {
     )
   }
 
-  const inputStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '9px 12px',
-    border: '1px solid rgba(10,10,11,0.14)',
-    borderRadius: 6,
-    fontSize: 13,
-    color: '#0A0A0B',
-    outline: 'none',
-    fontFamily: 'inherit',
-    background: '#FAFAFA',
-    transition: 'border-color 0.15s ease',
-    boxSizing: 'border-box',
-  }
-
-  const labelStyle: React.CSSProperties = {
-    display: 'block',
-    fontSize: 11,
-    fontWeight: 500,
-    letterSpacing: '0.04em',
-    textTransform: 'uppercase',
-    color: 'rgba(10,10,11,0.40)',
-    marginBottom: 6,
-  }
-
-  function onFocus(
-    e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>
-  ) {
-    e.currentTarget.style.borderColor = '#B5614A'
-    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(181,97,74,0.10)'
-  }
-  function onBlur(
-    e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>
-  ) {
-    e.currentTarget.style.borderColor = 'rgba(10,10,11,0.14)'
-    e.currentTarget.style.boxShadow = 'none'
-  }
-
   return (
-    <div
-      style={{
-        background: '#fff',
-        borderRadius: 12,
-        boxShadow: '0 1px 3px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04)',
-        padding: '32px 28px',
-      }}
-    >
-      <h2
-        style={{
-          fontSize: 16,
-          fontWeight: 600,
-          color: '#0A0A0B',
-          marginBottom: 4,
-          letterSpacing: '-0.02em',
-        }}
-      >
+    <div className="glass-modal p-7">
+      <h2 className="text-base font-semibold text-stone-900 mb-1 tracking-[-0.02em]">
         Criar conta
       </h2>
-      <p
-        style={{
-          fontSize: 13,
-          color: 'rgba(10,10,11,0.45)',
-          marginBottom: 24,
-          lineHeight: 1.5,
-        }}
-      >
+      <p className="text-[13px] text-stone-400 mb-6 leading-relaxed">
         Preencha os dados para criar seu acesso ao ArchiTrack.
       </p>
 
-      <form
-        onSubmit={handleSubmit}
-        style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
-      >
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
-          <label htmlFor="name" style={labelStyle}>
+          <label htmlFor="name" className="text-label block mb-1.5">
             Nome completo
           </label>
           <input
@@ -237,14 +131,12 @@ export function SignupForm() {
             value={form.name}
             onChange={handleChange}
             placeholder="Ana Silva"
-            style={inputStyle}
-            onFocus={onFocus}
-            onBlur={onBlur}
+            className="w-full px-3 py-2 text-[13px] text-stone-900 font-sans glass-input glass-input-terra"
           />
         </div>
 
         <div>
-          <label htmlFor="email" style={labelStyle}>
+          <label htmlFor="email" className="text-label block mb-1.5">
             E-mail
           </label>
           <input
@@ -255,14 +147,12 @@ export function SignupForm() {
             value={form.email}
             onChange={handleChange}
             placeholder="ana@escritorio.com"
-            style={inputStyle}
-            onFocus={onFocus}
-            onBlur={onBlur}
+            className="w-full px-3 py-2 text-[13px] text-stone-900 font-sans glass-input glass-input-terra"
           />
         </div>
 
         <div>
-          <label htmlFor="password" style={labelStyle}>
+          <label htmlFor="password" className="text-label block mb-1.5">
             Senha
           </label>
           <input
@@ -274,14 +164,12 @@ export function SignupForm() {
             value={form.password}
             onChange={handleChange}
             placeholder="Mínimo 6 caracteres"
-            style={inputStyle}
-            onFocus={onFocus}
-            onBlur={onBlur}
+            className="w-full px-3 py-2 text-[13px] text-stone-900 font-sans glass-input glass-input-terra"
           />
         </div>
 
         <div>
-          <label htmlFor="phone" style={labelStyle}>
+          <label htmlFor="phone" className="text-label block mb-1.5">
             Telefone WhatsApp
           </label>
           <input
@@ -292,23 +180,15 @@ export function SignupForm() {
             value={form.phone}
             onChange={handleChange}
             placeholder="5511999999999"
-            style={inputStyle}
-            onFocus={onFocus}
-            onBlur={onBlur}
+            className="w-full px-3 py-2 text-[13px] text-stone-900 font-sans glass-input glass-input-terra"
           />
-          <p
-            style={{
-              fontSize: 11,
-              color: 'rgba(10,10,11,0.35)',
-              marginTop: 4,
-            }}
-          >
+          <p className="text-[11px] text-stone-400 mt-1">
             Código do país + DDD + número (ex: 5511999999999)
           </p>
         </div>
 
         <div>
-          <label htmlFor="org_name" style={labelStyle}>
+          <label htmlFor="org_name" className="text-label block mb-1.5">
             Nome do escritório / organização
           </label>
           <input
@@ -319,14 +199,12 @@ export function SignupForm() {
             value={form.org_name}
             onChange={handleChange}
             placeholder="Meu Escritório"
-            style={inputStyle}
-            onFocus={onFocus}
-            onBlur={onBlur}
+            className="w-full px-3 py-2 text-[13px] text-stone-900 font-sans glass-input glass-input-terra"
           />
         </div>
 
         <div>
-          <label htmlFor="role" style={labelStyle}>
+          <label htmlFor="role" className="text-label block mb-1.5">
             Cargo
           </label>
           <select
@@ -335,9 +213,7 @@ export function SignupForm() {
             required
             value={form.role}
             onChange={handleChange}
-            style={{ ...inputStyle, cursor: 'pointer' }}
-            onFocus={onFocus}
-            onBlur={onBlur}
+            className="w-full px-3 py-2 text-[13px] text-stone-900 font-sans glass-input glass-input-terra cursor-pointer"
           >
             <option value="architect">Arquiteto</option>
             <option value="director">Gestor</option>
@@ -345,34 +221,13 @@ export function SignupForm() {
         </div>
 
         {error && (
-          <p style={{ fontSize: 12, color: '#DC2626' }}>{error}</p>
+          <p className="text-xs text-red-600">{error}</p>
         )}
 
         <button
           type="submit"
           disabled={loading}
-          style={{
-            width: '100%',
-            padding: '10px 16px',
-            background: loading ? 'rgba(181,97,74,0.55)' : '#B5614A',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 6,
-            fontSize: 13,
-            fontWeight: 500,
-            cursor: loading ? 'not-allowed' : 'pointer',
-            fontFamily: 'inherit',
-            letterSpacing: '-0.01em',
-            transition: 'background 0.15s ease',
-          }}
-          onMouseEnter={(e) => {
-            if (!loading)
-              (e.currentTarget as HTMLButtonElement).style.background = '#A0503A'
-          }}
-          onMouseLeave={(e) => {
-            if (!loading)
-              (e.currentTarget as HTMLButtonElement).style.background = '#B5614A'
-          }}
+          className="w-full py-2.5 px-4 bg-stone-900 text-white rounded-lg text-[13px] font-medium tracking-[-0.01em] transition-colors hover:bg-[#292524] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Criando conta...' : 'Criar conta'}
         </button>

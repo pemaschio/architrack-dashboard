@@ -10,64 +10,17 @@ export default async function LoginPage({
   const params = await searchParams
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: '#F4F2EF',
-        backgroundImage: `
-          linear-gradient(rgba(181,97,74,0.04) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(181,97,74,0.04) 1px, transparent 1px)
-        `,
-        backgroundSize: '40px 40px',
-      }}
-    >
-      <div style={{ width: '100%', maxWidth: 400, padding: '0 20px' }}>
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <div
-            style={{
-              width: 44,
-              height: 44,
-              borderRadius: 13,
-              background: '#B5614A',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 14px',
-              boxShadow: '0 4px 14px rgba(181,97,74,0.30)',
-            }}
-          >
+    <div className="min-h-screen flex items-center justify-center bg-[#EAEAE5] bg-[linear-gradient(rgba(168,162,158,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(168,162,158,0.08)_1px,transparent_1px)] bg-[length:40px_40px]">
+      <div className="w-full max-w-[400px] px-5">
+        <div className="text-center mb-8">
+          <div className="w-11 h-11 rounded-[13px] bg-terra flex items-center justify-center mx-auto mb-3.5 shadow-[0_4px_14px_rgba(181,97,74,0.3)]">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 20h9"/>
               <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
             </svg>
           </div>
-          <h1
-            style={{
-              fontSize: 22,
-              fontWeight: 700,
-              letterSpacing: '-0.04em',
-              color: '#1A1714',
-              lineHeight: 1,
-              margin: 0,
-            }}
-          >
-            ArchiTrack
-          </h1>
-          <p
-            style={{
-              fontSize: 11,
-              fontWeight: 500,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              color: 'rgba(10,10,11,0.34)',
-              marginTop: 6,
-            }}
-          >
-            Gestão de Escritório
-          </p>
+          <h1 className="text-[22px] font-bold tracking-[-0.04em] text-stone-900 leading-none">ArchiTrack</h1>
+          <p className="text-[11px] font-medium tracking-[0.08em] uppercase text-stone-400 mt-1.5">Gestão de Escritório</p>
         </div>
 
         <Suspense fallback={null}>
@@ -75,14 +28,14 @@ export default async function LoginPage({
         </Suspense>
 
         {params.error === 'pending_confirmation' && (
-          <p style={{ textAlign: 'center', fontSize: 12, color: '#DC2626', marginTop: 12 }}>
+          <p className="text-center text-xs text-red-600 mt-3">
             Sua conta ainda não foi confirmada. Verifique seu e-mail.
           </p>
         )}
 
-        <p style={{ textAlign: 'center', marginTop: 20, fontSize: 12, color: 'rgba(10,10,11,0.40)' }}>
+        <p className="text-center mt-5 text-xs text-stone-400">
           Ainda não tem conta?{' '}
-          <Link href="/signup" style={{ color: '#B5614A', fontWeight: 500, textDecoration: 'none' }}>
+          <Link href="/signup" className="text-terra font-medium no-underline hover:underline">
             Criar conta
           </Link>
         </p>
