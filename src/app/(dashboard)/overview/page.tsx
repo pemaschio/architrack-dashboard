@@ -69,39 +69,27 @@ export default async function OverviewPage() {
   const dateStr = now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+    <div className="flex flex-col gap-5">
       {/* Page header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+      <div className="flex items-start justify-between">
         <div>
-          <h1 style={{
-            fontSize: 22, fontWeight: 700, letterSpacing: '-0.025em',
-            color: '#0A0A0B', margin: 0, marginBottom: 4,
-          }}>
+          <h1 className="text-page-title mb-1">
             Painel
           </h1>
-          <p style={{ fontSize: 12, color: 'rgba(10,10,11,0.40)', margin: 0, textTransform: 'capitalize' }}>
+          <p className="text-label capitalize">
             {dateStr} · últimos 7 dias
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <form action="" method="get">
-            <button
-              type="submit"
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: 6,
-                padding: '7px 13px', borderRadius: 8, cursor: 'pointer',
-                background: '#fff', border: '1px solid rgba(10,10,11,0.10)',
-                fontSize: 12, fontWeight: 500, color: 'rgba(10,10,11,0.55)',
-                boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-                transition: 'all 0.15s',
-              }}
-            >
-              <RefreshCw style={{ width: 13, height: 13 }} />
-              Atualizar
-            </button>
-          </form>
-        </div>
+        <form action="" method="get">
+          <button
+            type="submit"
+            className="inline-flex items-center gap-1.5 px-3 py-[7px] rounded-lg cursor-pointer glass glass-hover text-xs font-medium text-stone-500 border-none"
+          >
+            <RefreshCw className="w-[13px] h-[13px]" />
+            Atualizar
+          </button>
+        </form>
       </div>
 
       <KpiCards
