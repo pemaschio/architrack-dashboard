@@ -46,16 +46,25 @@ function avatarStyle(name: string) {
   return { bg: AVATAR_BG[idx], fg: AVATAR_FG[idx] }
 }
 
-const sourceConfig: Record<string, { label: string; color: string; bg: string; Icon: React.ElementType }> = {
-  whatsapp_direct: { label: 'WhatsApp', color: '#15803d', bg: '#dcfce7', Icon: MessageCircle },
-  whatsapp_timer:  { label: 'Timer',    color: '#1d4ed8', bg: '#dbeafe', Icon: Timer },
-  dashboard:       { label: 'Dashboard', color: '#6b7280', bg: '#f3f4f6', Icon: Monitor },
+const sourceIcon: Record<string, React.ElementType> = {
+  whatsapp_direct: MessageCircle,
+  whatsapp_timer: Timer,
+  dashboard: Monitor,
 }
 
-const TH: React.CSSProperties = {
-  fontSize: 10, fontWeight: 600, letterSpacing: '0.08em',
-  textTransform: 'uppercase', color: 'rgba(10,10,11,0.38)',
-  textAlign: 'left', padding: '10px 16px', whiteSpace: 'nowrap',
+const sourceMeta: Record<string, { label: string; className: string }> = {
+  whatsapp_direct: {
+    label: 'WhatsApp',
+    className: 'inline-flex items-center gap-1 px-2 py-[3px] rounded-full text-[10px] font-semibold bg-green-600/[0.08] text-green-700',
+  },
+  whatsapp_timer: {
+    label: 'Timer',
+    className: 'inline-flex items-center gap-1 px-2 py-[3px] rounded-full text-[10px] font-semibold bg-blue-600/[0.08] text-blue-700',
+  },
+  dashboard: {
+    label: 'Dashboard',
+    className: 'inline-flex items-center gap-1 px-2 py-[3px] rounded-full text-[10px] font-semibold bg-stone-500/[0.08] text-stone-500',
+  },
 }
 
 export function TimeEntriesTable({ entries, filterProject, onClearFilter }: Props) {
@@ -69,69 +78,53 @@ export function TimeEntriesTable({ entries, filterProject, onClearFilter }: Prop
   const hasMore = filtered.length > 20
 
   return (
-    <div style={{
-      background: '#ffffff', borderRadius: 12,
-      boxShadow: '0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.05)',
-      overflow: 'hidden',
-    }}>
+    <div className="glass overflow-hidden">
       {/* Header */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '14px 20px', borderBottom: '1px solid rgba(10,10,11,0.06)',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 14, fontWeight: 600, color: '#0A0A0B' }}>
+      <div className="flex items-center justify-between px-[18px] py-3.5 border-b border-stone-300/20">
+        <div className="flex items-center gap-2.5">
+          <span className="text-section-title">
             Registros recentes
           </span>
 
           {filterProject && (
-            <span style={{
-              display: 'inline-flex', alignItems: 'center', gap: 5,
-              fontSize: 11, fontWeight: 600,
-              background: 'rgba(10,10,11,0.05)', color: '#0A0A0B',
-              borderRadius: 999, padding: '3px 8px 3px 6px',
-              border: '1px solid rgba(10,10,11,0.08)',
-            }}>
-              <span style={{
-                width: 6, height: 6, borderRadius: '50%',
-                background: projectColor(filterProject), display: 'inline-block', flexShrink: 0,
-              }} />
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold bg-stone-300/15 text-stone-800 rounded-full py-[3px] px-2 pl-1.5 border border-stone-300/20">
+              <span
+                className="w-1.5 h-1.5 rounded-full inline-block shrink-0"
+                style={{ background: projectColor(filterProject) }}
+              />
               {filterProject}
               {onClearFilter && (
                 <button
                   onClick={onClearFilter}
-                  style={{
-                    marginLeft: 1, display: 'flex', border: 'none',
-                    background: 'none', cursor: 'pointer', padding: 0, color: 'inherit', opacity: 0.55,
-                  }}
+                  className="ml-0.5 flex border-none bg-transparent cursor-pointer p-0 text-inherit opacity-55"
                   aria-label="Remover filtro"
                 >
-                  <X style={{ width: 11, height: 11 }} />
+                  <X className="w-[11px] h-[11px]" />
                 </button>
               )}
             </span>
           )}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 11, color: 'rgba(10,10,11,0.32)', fontWeight: 500 }}>
+        <div className="flex items-center gap-2.5">
+          <span className="text-label">
             {filtered.length} registro{filtered.length !== 1 ? 's' : ''}
           </span>
         </div>
       </div>
 
       {/* Table */}
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+      <div className="overflow-x-auto">
+        <table className="w-full">
           <thead>
-            <tr style={{ borderBottom: '1px solid rgba(10,10,11,0.05)', background: 'rgba(10,10,11,0.015)' }}>
-              <th style={{ ...TH, width: 20, padding: '10px 8px 10px 20px' }} />
-              <th style={TH}>Arquiteto</th>
-              <th style={TH}>Projeto</th>
-              <th style={TH}>Atividade</th>
-              <th style={TH}>Duração</th>
-              <th style={TH}>Origem</th>
-              <th style={TH}>Quando</th>
+            <tr className="border-b border-stone-300/15 bg-white/[0.03]">
+              <th className="text-label text-left py-2.5 pl-5 pr-2 w-5" />
+              <th className="text-label text-left px-4 py-2.5 whitespace-nowrap">Arquiteto</th>
+              <th className="text-label text-left px-4 py-2.5 whitespace-nowrap">Projeto</th>
+              <th className="text-label text-left px-4 py-2.5 whitespace-nowrap">Atividade</th>
+              <th className="text-label text-left px-4 py-2.5 whitespace-nowrap">Duração</th>
+              <th className="text-label text-left px-4 py-2.5 whitespace-nowrap">Origem</th>
+              <th className="text-label text-left px-4 py-2.5 whitespace-nowrap">Quando</th>
             </tr>
           </thead>
           <tbody>
@@ -142,132 +135,105 @@ export function TimeEntriesTable({ entries, filterProject, onClearFilter }: Prop
               const projName = entry.projects?.name ?? ''
               const userName = entry.users?.name ?? ''
               const av = userName ? avatarStyle(userName) : null
-              const src = sourceConfig[entry.source]
+              const src = sourceMeta[entry.source]
+              const SrcIcon = sourceIcon[entry.source]
 
               return (
                 <Fragment key={entry.id}>
                   <tr
-                    style={{
-                      borderBottom: isLast && !isExpanded ? 'none' : '1px solid rgba(10,10,11,0.04)',
-                      background: isExpanded ? 'rgba(10,10,11,0.018)' : 'transparent',
-                      cursor: hasDescription ? 'pointer' : 'default',
-                      transition: 'background 0.1s ease',
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isExpanded)
-                        (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(10,10,11,0.02)'
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isExpanded)
-                        (e.currentTarget as HTMLTableRowElement).style.background = 'transparent'
-                    }}
+                    className={[
+                      'transition-colors',
+                      isLast && !isExpanded ? '' : 'border-b border-stone-300/[0.12]',
+                      isExpanded ? 'bg-white/20' : 'hover:bg-white/30',
+                      hasDescription ? 'cursor-pointer' : 'cursor-default',
+                    ].join(' ')}
                     onClick={() => hasDescription && setExpandedId(isExpanded ? null : entry.id)}
                   >
                     {/* Chevron */}
-                    <td style={{ padding: '11px 8px 11px 20px', width: 20 }}>
+                    <td className="py-[11px] pl-5 pr-2 w-5">
                       {hasDescription
                         ? isExpanded
-                          ? <ChevronDown style={{ width: 12, height: 12, color: '#0066CC' }} />
-                          : <ChevronRight style={{ width: 12, height: 12, color: 'rgba(10,10,11,0.22)' }} />
+                          ? <ChevronDown className="w-3 h-3 text-[#0066CC]" />
+                          : <ChevronRight className="w-3 h-3 text-stone-400" />
                         : null}
                     </td>
 
                     {/* Architect + avatar */}
-                    <td style={{ padding: '10px 16px', whiteSpace: 'nowrap' }}>
+                    <td className="px-4 py-2.5 whitespace-nowrap">
                       {userName ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div className="flex items-center gap-2">
                           {av && (
-                            <div style={{
-                              width: 26, height: 26, borderRadius: '50%', flexShrink: 0,
-                              background: av.bg, color: av.fg,
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              fontSize: 9, fontWeight: 800,
-                            }}>
+                            <div
+                              className="w-[26px] h-[26px] rounded-full shrink-0 flex items-center justify-center text-[9px] font-extrabold"
+                              style={{ background: av.bg, color: av.fg }}
+                            >
                               {initials(userName)}
                             </div>
                           )}
-                          <span style={{ fontSize: 13, fontWeight: 500, color: '#0A0A0B' }}>{userName}</span>
+                          <span className="text-[13px] font-medium text-stone-800">{userName}</span>
                         </div>
                       ) : (
-                        <span style={{ fontSize: 13, color: 'rgba(10,10,11,0.30)' }}>—</span>
+                        <span className="text-[13px] text-stone-400">—</span>
                       )}
                     </td>
 
                     {/* Project */}
-                    <td style={{ padding: '10px 16px', whiteSpace: 'nowrap' }}>
+                    <td className="px-4 py-2.5 whitespace-nowrap">
                       {projName ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          <div style={{
-                            width: 6, height: 6, borderRadius: '50%',
-                            background: projectColor(projName), flexShrink: 0,
-                          }} />
-                          <span style={{ fontSize: 13, color: 'rgba(10,10,11,0.65)', fontWeight: 500 }}>
+                        <div className="flex items-center gap-1.5">
+                          <div
+                            className="w-1.5 h-1.5 rounded-full shrink-0"
+                            style={{ background: projectColor(projName) }}
+                          />
+                          <span className="text-[13px] text-stone-500 font-medium">
                             {projName}
                           </span>
                         </div>
                       ) : (
-                        <span style={{ fontSize: 13, color: 'rgba(10,10,11,0.24)' }}>—</span>
+                        <span className="text-[13px] text-stone-300">—</span>
                       )}
                     </td>
 
                     {/* Activity */}
-                    <td style={{ padding: '10px 16px', fontSize: 12, color: 'rgba(10,10,11,0.48)' }}>
+                    <td className="px-4 py-2.5 text-xs text-stone-400">
                       {entry.activity_types?.name ?? '—'}
                     </td>
 
                     {/* Duration */}
-                    <td style={{ padding: '10px 16px', whiteSpace: 'nowrap' }}>
+                    <td className="px-4 py-2.5 whitespace-nowrap">
                       {entry.duration_min ? (
-                        <span style={{
-                          display: 'inline-block',
-                          padding: '2px 8px', borderRadius: 999,
-                          background: '#f0f9ff', border: '1px solid #bae6fd',
-                          fontSize: 12, fontWeight: 700, color: '#0369a1',
-                        }}>
+                        <span className="inline-block px-2 py-0.5 rounded-full bg-stone-300/15 text-xs font-semibold text-[#57534e]">
                           {formatDuration(entry.duration_min)}
                         </span>
                       ) : (
-                        <span style={{ fontSize: 13, color: 'rgba(10,10,11,0.30)' }}>—</span>
+                        <span className="text-[13px] text-stone-400">—</span>
                       )}
                     </td>
 
                     {/* Source badge */}
-                    <td style={{ padding: '10px 16px' }}>
+                    <td className="px-4 py-2.5">
                       {src ? (
-                        <div style={{
-                          display: 'inline-flex', alignItems: 'center', gap: 4,
-                          padding: '3px 8px', borderRadius: 999,
-                          background: src.bg, fontSize: 11, fontWeight: 600, color: src.color,
-                          whiteSpace: 'nowrap',
-                        }}>
-                          <src.Icon style={{ width: 10, height: 10 }} />
+                        <div className={src.className}>
+                          {SrcIcon && <SrcIcon className="w-2.5 h-2.5" />}
                           {src.label}
                         </div>
                       ) : (
-                        <span style={{ fontSize: 12, color: 'rgba(10,10,11,0.38)' }}>
+                        <span className="text-xs text-stone-400">
                           {entry.source}
                         </span>
                       )}
                     </td>
 
                     {/* When */}
-                    <td style={{ padding: '10px 16px', fontSize: 11, color: 'rgba(10,10,11,0.32)', whiteSpace: 'nowrap' }}>
+                    <td className="px-4 py-2.5 text-[10px] text-stone-400 whitespace-nowrap">
                       {formatDistanceToNow(new Date(entry.started_at), { addSuffix: true, locale: ptBR })}
                     </td>
                   </tr>
 
                   {isExpanded && entry.description && (
-                    <tr style={{
-                      borderBottom: '1px solid rgba(10,10,11,0.04)',
-                      background: 'rgba(10,10,11,0.015)',
-                    }}>
-                      <td colSpan={7} style={{ padding: '8px 20px 12px 60px' }}>
-                        <p style={{
-                          fontSize: 12, color: 'rgba(10,10,11,0.52)',
-                          fontStyle: 'italic', lineHeight: 1.6, margin: 0,
-                          padding: '8px 12px', background: '#f8fafc',
-                          borderRadius: 8, borderLeft: '2px solid #e2e8f0',
-                        }}>
+                    <tr className="border-b border-stone-300/[0.12] bg-white/[0.02]">
+                      <td colSpan={7} className="py-2 px-5 pl-[60px]">
+                        <p className="text-xs text-stone-500 italic leading-relaxed m-0 p-2 px-3 bg-white/20 rounded-lg border-l-2 border-stone-300">
                           &ldquo;{entry.description}&rdquo;
                         </p>
                       </td>
@@ -279,10 +245,7 @@ export function TimeEntriesTable({ entries, filterProject, onClearFilter }: Prop
 
             {displayed.length === 0 && (
               <tr>
-                <td colSpan={7} style={{
-                  padding: '48px 20px', textAlign: 'center',
-                  fontSize: 13, color: 'rgba(10,10,11,0.28)',
-                }}>
+                <td colSpan={7} className="py-12 px-5 text-center text-[13px] text-stone-300">
                   {filterProject
                     ? `Nenhum registro para "${filterProject}" nos últimos 7 dias.`
                     : 'Nenhum registro nos últimos 7 dias.'}
@@ -295,13 +258,9 @@ export function TimeEntriesTable({ entries, filterProject, onClearFilter }: Prop
 
       {/* Footer */}
       {(hasMore || displayed.length > 0) && (
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '10px 20px', borderTop: '1px solid rgba(10,10,11,0.05)',
-          background: 'rgba(10,10,11,0.012)',
-        }}>
+        <div className="flex items-center justify-between px-[18px] py-2.5 border-t border-stone-300/15 bg-white/[0.02]">
           {hasMore ? (
-            <span style={{ fontSize: 11, color: 'rgba(10,10,11,0.32)' }}>
+            <span className="text-[11px] text-stone-400">
               Mostrando 20 de {filtered.length} registros
             </span>
           ) : (
@@ -310,18 +269,10 @@ export function TimeEntriesTable({ entries, filterProject, onClearFilter }: Prop
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <Link
             href={'/projects' as any}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 5,
-              fontSize: 12, fontWeight: 600, color: '#0066CC',
-              textDecoration: 'none',
-              padding: '5px 12px', borderRadius: 8,
-              border: '1px solid rgba(0,102,204,0.20)',
-              background: 'rgba(0,102,204,0.04)',
-              transition: 'all 0.15s',
-            }}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-500 no-underline px-3 py-1.5 rounded-lg glass glass-hover"
           >
             Ver projetos completos
-            <ArrowRight style={{ width: 12, height: 12 }} />
+            <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
       )}
