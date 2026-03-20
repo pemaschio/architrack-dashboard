@@ -158,6 +158,21 @@ export function LoginForm() {
         >
           {loading ? 'Entrando...' : 'Entrar'}
         </button>
+
+        <div style={{ textAlign: 'center', marginTop: 4 }}>
+          <a
+            href="/reset-password"
+            style={{
+              fontSize: 12,
+              color: '#B5614A',
+              textDecoration: 'none',
+              fontWeight: 500,
+              fontFamily: 'inherit',
+            }}
+          >
+            Esqueci minha senha
+          </a>
+        </div>
       </form>
     </div>
   )

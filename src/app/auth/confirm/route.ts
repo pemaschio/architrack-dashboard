@@ -64,9 +64,11 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const code = searchParams.get('code')
   const token_hash = searchParams.get('token_hash')
-  const type = searchParams.get('type') as 'email' | 'magiclink' | 'signup' | null
+  const type = searchParams.get('type') as 'email' | 'magiclink' | 'signup' | 'recovery' | null
 
-  const successUrl = new URL('/overview', request.url)
+  const successUrl = type === 'recovery'
+    ? new URL('/update-password', request.url)
+    : new URL('/overview', request.url)
 
   function errorRedirect(reason: string) {
     return NextResponse.redirect(

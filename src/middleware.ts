@@ -31,7 +31,10 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl
   const isAuthRoute =
-    pathname.startsWith('/login') || pathname.startsWith('/signup')
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/signup') ||
+    pathname.startsWith('/reset-password') ||
+    pathname.startsWith('/update-password')
   const isDashboardRoute =
     pathname.startsWith('/overview') ||
     pathname.startsWith('/projects') ||
@@ -43,8 +46,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // Authenticated user on auth route → dashboard
-  if (user && isAuthRoute) {
+  // Authenticated user on auth route → dashboard (except update-password)
+  if (user && isAuthRoute && !pathname.startsWith('/update-password')) {
     return NextResponse.redirect(new URL('/overview', request.url))
   }
 
