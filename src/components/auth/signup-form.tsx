@@ -23,6 +23,7 @@ export function SignupForm() {
     org_name: '',
     role: 'architect' as 'architect' | 'director',
     email: '',
+    password: '',
   })
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
@@ -47,11 +48,16 @@ export function SignupForm() {
       return
     }
 
+    if (form.password.length < 6) {
+      setError('A senha deve ter pelo menos 6 caracteres.')
+      return
+    }
+
     setLoading(true)
-    const { error: otpError } = await supabase.auth.signInWithOtp({
+    const { error: signUpError } = await supabase.auth.signUp({
       email: form.email.trim(),
+      password: form.password,
       options: {
-        shouldCreateUser: true,
         emailRedirectTo: `${window.location.origin}/auth/confirm`,
         data: {
           name: form.name.trim(),
@@ -62,8 +68,12 @@ export function SignupForm() {
       },
     })
 
-    if (otpError) {
-      setError('Erro ao criar conta. Tente novamente.')
+    if (signUpError) {
+      if (signUpError.message?.includes('already registered')) {
+        setError('Este e-mail já está cadastrado. Faça login.')
+      } else {
+        setError('Erro ao criar conta. Tente novamente.')
+      }
     } else {
       setSent(true)
     }
@@ -114,11 +124,11 @@ export function SignupForm() {
             margin: 0,
           }}
         >
-          Enviamos um link de acesso para{' '}
+          Enviamos um link de confirmação para{' '}
           <strong style={{ color: '#0A0A0B', fontWeight: 500 }}>
             {form.email}
           </strong>
-          . Clique no link para entrar.
+          . Confirme seu e-mail para ativar a conta.
         </p>
         <button
           onClick={() => {
@@ -252,6 +262,25 @@ export function SignupForm() {
         </div>
 
         <div>
+          <label htmlFor="password" style={labelStyle}>
+            Senha
+          </label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            required
+            minLength={6}
+            value={form.password}
+            onChange={handleChange}
+            placeholder="Mínimo 6 caracteres"
+            style={inputStyle}
+            onFocus={onFocus}
+            onBlur={onBlur}
+          />
+        </div>
+
+        <div>
           <label htmlFor="phone" style={labelStyle}>
             Telefone WhatsApp
           </label>
@@ -289,7 +318,7 @@ export function SignupForm() {
             required
             value={form.org_name}
             onChange={handleChange}
-            placeholder="Zé Arquitetos"
+            placeholder="Meu Escritório"
             style={inputStyle}
             onFocus={onFocus}
             onBlur={onBlur}
