@@ -74,7 +74,7 @@ export function UserCardList({ users }: Props) {
 
   return (
     <>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14 }}>
+      <div className="grid grid-cols-3 gap-3.5">
         {users.map((user) => {
           const role = roleConfig[user.role] ?? roleConfig.architect
           const RoleIcon = role.Icon
@@ -85,117 +85,76 @@ export function UserCardList({ users }: Props) {
             <button
               key={user.id}
               onClick={() => handleCardClick(user.id)}
-              style={{
-                background: '#ffffff',
-                borderRadius: 12,
-                padding: 0,
-                textAlign: 'left',
-                border: isActive
-                  ? `1px solid ${role.accent}`
-                  : '1px solid rgba(10,10,11,0.07)',
-                boxShadow: isActive
-                  ? `0 4px 16px rgba(0,0,0,0.10), 0 0 0 2px ${role.accent}20`
-                  : '0 1px 4px rgba(0,0,0,0.06)',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                overflow: 'hidden',
-                position: 'relative',
-              }}
-              onMouseEnter={(e) => {
-                if (!isActive) {
-                  const el = e.currentTarget as HTMLButtonElement
-                  el.style.boxShadow = '0 6px 20px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.06)'
-                  el.style.transform = 'translateY(-2px)'
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isActive) {
-                  const el = e.currentTarget as HTMLButtonElement
-                  el.style.boxShadow = '0 1px 4px rgba(0,0,0,0.06)'
-                  el.style.transform = 'translateY(0)'
-                }
-              }}
+              className="glass glass-hover overflow-hidden text-left cursor-pointer transition-all hover:-translate-y-[2px] relative"
+              style={isActive ? {
+                border: `1px solid ${role.accent}`,
+                boxShadow: `0 4px 16px rgba(0,0,0,0.10), 0 0 0 2px ${role.accent}20`,
+              } : undefined}
             >
               {/* Role accent top bar */}
-              <div style={{ height: 3, background: role.accent, width: '100%' }} />
+              <div className="h-[3px] w-full" style={{ background: role.accent }} />
 
-              <div style={{ padding: '16px 18px 14px' }}>
+              <div className="p-4 pt-3.5">
                 {/* Avatar + Name + Role */}
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 14 }}>
+                <div className="flex items-start gap-3 mb-3.5">
                   {/* Avatar */}
-                  <div style={{
-                    width: 44, height: 44, borderRadius: 12, flexShrink: 0,
-                    background: av.bg, color: av.fg,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 15, fontWeight: 800, letterSpacing: '-0.02em',
-                  }}>
+                  <div
+                    className="w-11 h-11 rounded-xl shrink-0 flex items-center justify-center text-[15px] font-extrabold tracking-tight"
+                    style={{ background: av.bg, color: av.fg }}
+                  >
                     {initials(user.name)}
                   </div>
 
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 6, marginBottom: 4 }}>
-                      <h2 style={{
-                        fontWeight: 700, color: '#0A0A0B', fontSize: 14,
-                        margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                      }}>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-1.5 mb-1">
+                      <h2 className="font-bold text-stone-900 text-sm overflow-hidden text-ellipsis whitespace-nowrap">
                         {user.name}
                       </h2>
-                      <ChevronRight style={{ width: 14, height: 14, color: 'rgba(10,10,11,0.25)', flexShrink: 0, marginTop: 2 }} />
+                      <ChevronRight className="w-3.5 h-3.5 text-stone-300 shrink-0 mt-0.5" />
                     </div>
 
                     {/* Role badge */}
-                    <div style={{
-                      display: 'inline-flex', alignItems: 'center', gap: 4,
-                      padding: '2px 8px', borderRadius: 999,
-                      background: role.bg, fontSize: 10, fontWeight: 700, color: role.color,
-                    }}>
-                      <RoleIcon style={{ width: 9, height: 9 }} />
+                    <div
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold"
+                      style={{ background: role.bg, color: role.color }}
+                    >
+                      <RoleIcon className="w-[9px] h-[9px]" />
                       {role.label}
                     </div>
                   </div>
                 </div>
 
                 {/* Divider */}
-                <div style={{ height: 1, background: 'rgba(10,10,11,0.05)', marginBottom: 12 }} />
+                <div className="h-px bg-stone-300/15 mb-3" />
 
                 {/* Phone */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
-                  <Phone style={{ width: 12, height: 12, color: 'rgba(10,10,11,0.30)', flexShrink: 0 }} />
-                  <span style={{
-                    fontSize: 12, color: 'rgba(10,10,11,0.50)',
-                    fontFamily: 'ui-monospace, monospace', letterSpacing: '0.01em',
-                  }}>
+                <div className="flex items-center gap-1.5 mb-2.5">
+                  <Phone className="w-3 h-3 text-stone-300 shrink-0" />
+                  <span className="text-xs text-stone-400 font-mono tracking-[0.01em]">
                     {formatPhone(user.phone)}
                   </span>
                 </div>
 
                 {/* Rate + Status */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{
-                    fontSize: 12, fontWeight: 600,
-                    color: user.hourly_rate ? '#0A0A0B' : 'rgba(10,10,11,0.30)',
-                  }}>
+                <div className="flex items-center justify-between">
+                  <span className={`text-xs font-semibold ${user.hourly_rate ? 'text-stone-900' : 'text-stone-300'}`}>
                     {user.hourly_rate
                       ? `R$ ${user.hourly_rate.toFixed(2).replace('.', ',')}/h`
                       : 'Sem valor/hora'}
                   </span>
 
                   {/* Status indicator */}
-                  <div style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 5,
-                    padding: '3px 8px', borderRadius: 999,
-                    background: user.is_active ? '#f0fdf4' : '#f9fafb',
-                    border: `1px solid ${user.is_active ? '#bbf7d0' : '#e5e7eb'}`,
-                    fontSize: 11, fontWeight: 600,
-                    color: user.is_active ? '#15803d' : 'rgba(10,10,11,0.38)',
-                  }}>
-                    <span style={{
-                      width: 6, height: 6, borderRadius: '50%',
-                      background: user.is_active ? '#16A34A' : 'rgba(10,10,11,0.20)',
-                      boxShadow: user.is_active ? '0 0 0 2px rgba(22,163,74,0.20)' : 'none',
-                    }} />
-                    {user.is_active ? 'Ativo' : 'Inativo'}
-                  </div>
+                  {user.is_active ? (
+                    <div className="inline-flex items-center gap-1.5 px-2 py-[3px] rounded-full bg-green-50 border border-green-200 text-[11px] font-semibold text-green-700">
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-600 shadow-[0_0_0_2px_rgba(22,163,74,0.20)]" />
+                      Ativo
+                    </div>
+                  ) : (
+                    <div className="inline-flex items-center gap-1.5 px-2 py-[3px] rounded-full bg-gray-50 border border-gray-200 text-[11px] font-semibold text-stone-400">
+                      <span className="w-1.5 h-1.5 rounded-full bg-stone-300" />
+                      Inativo
+                    </div>
+                  )}
                 </div>
               </div>
             </button>
@@ -203,10 +162,7 @@ export function UserCardList({ users }: Props) {
         })}
 
         {users.length === 0 && (
-          <div style={{
-            gridColumn: '1/-1', textAlign: 'center',
-            color: 'rgba(10,10,11,0.32)', padding: '48px 20px', fontSize: 13,
-          }}>
+          <div className="col-span-full text-center text-stone-300 py-12 text-[13px]">
             Nenhum membro ativo.
           </div>
         )}

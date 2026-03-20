@@ -16,26 +16,19 @@ export default async function TeamPage() {
   const directors = users?.filter((u) => u.role === 'director').length || 0
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+    <div className="flex flex-col gap-5">
       {/* Page header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+      <div className="flex items-start justify-between">
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-            <h1 style={{
-              fontSize: 22, fontWeight: 700, letterSpacing: '-0.025em',
-              color: '#0A0A0B', margin: 0,
-            }}>
+          <div className="flex items-center gap-2.5 mb-1">
+            <h1 className="text-page-title">
               Equipe
             </h1>
-            <span style={{
-              fontSize: 11, fontWeight: 700,
-              padding: '2px 8px', borderRadius: 999,
-              background: 'rgba(181,97,74,0.10)', color: '#B5614A',
-            }}>
+            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-terra-subtle text-terra">
               {total} membros
             </span>
           </div>
-          <p style={{ fontSize: 12, color: 'rgba(10,10,11,0.40)', margin: 0 }}>
+          <p className="text-xs text-stone-400">
             {architects > 0 && `${architects} arquiteto${architects !== 1 ? 's' : ''}`}
             {architects > 0 && directors > 0 && ' · '}
             {directors > 0 && `${directors} diretor${directors !== 1 ? 'es' : ''}`}
