@@ -9,6 +9,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+      },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
@@ -48,6 +51,17 @@ const config: Config = {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
+        stone: {
+          900: '#1C1C1C',
+          500: '#78716c',
+          400: '#a8a29e',
+          300: '#d6d3d1',
+          200: '#e7e5e4',
+        },
+        terra: {
+          DEFAULT: '#B5614A',
+          subtle: 'rgba(181,97,74,0.10)',
+        },
       },
     },
   },
