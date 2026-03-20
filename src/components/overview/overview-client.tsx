@@ -55,12 +55,12 @@ function ProjectDonut({
   const fillColor = isOver ? '#ef4444' : isAlert ? '#f59e0b' : color
 
   return (
-    <div style={{ position: 'relative', width: 108, height: 108, flexShrink: 0 }}>
+    <div className="relative w-[108px] h-[108px] shrink-0">
       <svg width="108" height="108" viewBox="0 0 108 108">
         {/* Shadow / depth ring */}
         <circle cx="54" cy="54" r={r + 4} fill="none" stroke={color} strokeWidth="1" strokeOpacity="0.07" />
         {/* Track */}
-        <circle cx="54" cy="54" r={r} fill="none" stroke="#f1f5f9" strokeWidth={stroke} />
+        <circle cx="54" cy="54" r={r} fill="none" stroke="rgba(168,162,158,0.15)" strokeWidth={stroke} />
         {/* Progress arc */}
         {hasBudget ? (
           <circle
@@ -97,28 +97,24 @@ function ProjectDonut({
       </svg>
 
       {/* Center content */}
-      <div style={{
-        position: 'absolute', inset: 0,
-        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        pointerEvents: 'none',
-      }}>
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
         {loading ? (
-          <div style={{ width: 16, height: 16, borderRadius: '50%', border: `2px solid ${color}`, borderTopColor: 'transparent', animation: 'spin 0.8s linear infinite' }} />
+          <div className="w-4 h-4 rounded-full animate-spin" style={{ border: `2px solid ${color}`, borderTopColor: 'transparent' }} />
         ) : hasBudget ? (
           <>
-            <span style={{ fontSize: 17, fontWeight: 800, color: fillColor, lineHeight: 1, letterSpacing: '-0.02em' }}>
+            <span className="text-[17px] font-extrabold leading-none tracking-tight" style={{ color: fillColor }}>
               {clampedPct}%
             </span>
-            <span style={{ fontSize: 9, color: '#9ca3af', marginTop: 3, fontWeight: 500 }}>
+            <span className="text-[9px] text-stone-400 mt-[3px] font-medium">
               {totalHours}h de {budgetH}h
             </span>
           </>
         ) : (
           <>
-            <span style={{ fontSize: 17, fontWeight: 800, color: color, lineHeight: 1, letterSpacing: '-0.02em' }}>
+            <span className="text-[17px] font-extrabold leading-none tracking-tight" style={{ color }}>
               {totalHours}h
             </span>
-            <span style={{ fontSize: 9, color: '#9ca3af', marginTop: 3 }}>registradas</span>
+            <span className="text-[9px] text-stone-400 mt-[3px]">registradas</span>
           </>
         )}
       </div>
@@ -141,11 +137,6 @@ function ProjectDonutCard({ project, onClick, isActive, loading }: {
   const isAlert = hasBudget && totalHours >= budgetH! * (project.alert_threshold / 100)
   const isOver = hasBudget && totalHours >= budgetH!
 
-  const accentBorder = isActive ? `2px solid ${color}` : '1px solid rgba(10,10,11,0.06)'
-  const cardShadow = isActive
-    ? `0 0 0 3px ${color}22, 0 8px 24px rgba(0,0,0,0.10)`
-    : '0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.05)'
-
   return (
     <div
       onClick={onClick}
@@ -153,80 +144,46 @@ function ProjectDonutCard({ project, onClick, isActive, loading }: {
       tabIndex={0}
       onKeyDown={(e) => e.key === 'Enter' && onClick()}
       aria-pressed={isActive}
-      style={{
-        background: '#fff',
-        borderRadius: 14,
-        overflow: 'hidden',
-        cursor: 'pointer',
-        transition: 'box-shadow 0.2s ease, transform 0.18s ease',
-        boxShadow: cardShadow,
-        border: accentBorder,
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative',
-        userSelect: 'none',
-      }}
-      onMouseEnter={(e) => {
-        if (!isActive) {
-          (e.currentTarget as HTMLDivElement).style.boxShadow = '0 6px 20px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.07)'
-          ;(e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)'
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (!isActive) {
-          (e.currentTarget as HTMLDivElement).style.boxShadow = '0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.05)'
-          ;(e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'
-        }
-      }}
+      className="glass glass-hover overflow-hidden cursor-pointer transition-all hover:-translate-y-[2px] flex flex-col relative select-none"
+      style={isActive ? {
+        border: `2px solid ${color}`,
+        boxShadow: `0 0 0 3px ${color}22`,
+      } : undefined}
     >
       {/* Accent bar */}
-      <div style={{ height: 3, background: color, flexShrink: 0 }} />
+      <div className="h-[3px] shrink-0" style={{ background: color }} />
 
-      <div style={{ padding: '14px 16px 16px', flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div className="px-4 pt-3.5 pb-4 flex-1 flex flex-col gap-3">
 
         {/* Project name + alert badge */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 6 }}>
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <p style={{
-              fontSize: 13, fontWeight: 700, color: '#0A0A0B', margin: 0,
-              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-              letterSpacing: '-0.01em',
-            }}>
+        <div className="flex items-start justify-between gap-1.5">
+          <div className="min-w-0 flex-1">
+            <p className="text-[13px] font-bold text-stone-900 overflow-hidden text-ellipsis whitespace-nowrap m-0 tracking-tight">
               {project.name}
             </p>
             {project.client_name && (
-              <p style={{ fontSize: 10, color: 'rgba(10,10,11,0.38)', margin: '2px 0 0', fontWeight: 500 }}>
+              <p className="text-[10px] text-stone-400 font-medium mt-0.5 m-0">
                 {project.client_name}
               </p>
             )}
           </div>
 
           {isOver && (
-            <div style={{
-              flexShrink: 0, display: 'flex', alignItems: 'center', gap: 3,
-              padding: '2px 6px', borderRadius: 999,
-              background: '#fef2f2', border: '1px solid #fca5a5',
-              fontSize: 9, fontWeight: 700, color: '#dc2626',
-            }}>
-              <AlertTriangle style={{ width: 8, height: 8 }} />
+            <div className="shrink-0 flex items-center gap-[3px] px-1.5 py-0.5 rounded-full bg-red-50 border border-red-300 text-[9px] font-bold text-red-600">
+              <AlertTriangle className="w-2 h-2" />
               EXTRA
             </div>
           )}
           {!isOver && isAlert && (
-            <div style={{
-              flexShrink: 0, display: 'flex', alignItems: 'center', gap: 3,
-              padding: '2px 6px', borderRadius: 999,
-              background: '#fffbeb', border: '1px solid #fde68a',
-              fontSize: 9, fontWeight: 700, color: '#d97706',
-            }}>
-              <AlertTriangle style={{ width: 8, height: 8 }} />
+            <div className="shrink-0 flex items-center gap-[3px] px-1.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-[9px] font-bold text-amber-600">
+              <AlertTriangle className="w-2 h-2" />
               ALERTA
             </div>
           )}
         </div>
 
         {/* Donut */}
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div className="flex justify-center">
           <ProjectDonut
             pct={pct}
             color={color}
@@ -239,28 +196,26 @@ function ProjectDonutCard({ project, onClick, isActive, loading }: {
         </div>
 
         {/* Stats */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 5, borderTop: '1px solid rgba(10,10,11,0.05)', paddingTop: 10 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <Clock style={{ width: 10, height: 10, color: '#9ca3af', flexShrink: 0 }} />
-              <span style={{ fontSize: 10, color: '#9ca3af', fontWeight: 500 }}>Horas</span>
+        <div className="flex flex-col gap-[5px] border-t border-stone-300/15 pt-2.5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1">
+              <Clock className="w-2.5 h-2.5 text-stone-400 shrink-0" />
+              <span className="text-[10px] text-stone-400 font-medium">Horas</span>
             </div>
-            <span style={{
-              fontSize: 12, fontWeight: 700,
-              color: isOver ? '#ef4444' : isAlert ? '#d97706' : '#0A0A0B',
-              fontVariantNumeric: 'tabular-nums',
-            }}>
+            <span className={`text-xs font-bold tabular-nums ${
+              isOver ? 'text-red-500' : isAlert ? 'text-amber-600' : 'text-stone-900'
+            }`}>
               {totalHours}h{hasBudget ? ` / ${budgetH}h` : ''}
             </span>
           </div>
 
           {project.budget_value != null && (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <Wallet style={{ width: 10, height: 10, color: '#9ca3af', flexShrink: 0 }} />
-                <span style={{ fontSize: 10, color: '#9ca3af', fontWeight: 500 }}>Valor</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1">
+                <Wallet className="w-2.5 h-2.5 text-stone-400 shrink-0" />
+                <span className="text-[10px] text-stone-400 font-medium">Valor</span>
               </div>
-              <span style={{ fontSize: 12, fontWeight: 700, color: '#0A0A0B' }}>
+              <span className="text-xs font-bold text-stone-900">
                 {project.budget_value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
               </span>
             </div>
@@ -302,67 +257,41 @@ export function OverviewClient({ entries, projectsWithStats }: Props) {
   return (
     <>
       {/* Action bar */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: -8 }}>
+      <div className="flex justify-end -mt-2">
         <button
           onClick={() => setEntryDialogOpen(true)}
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: 6,
-            padding: '8px 16px', borderRadius: 9,
-            background: '#1d4ed8', color: '#fff',
-            border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600,
-            boxShadow: '0 2px 8px rgba(29,78,216,0.30)',
-            transition: 'all 0.15s',
-          }}
-          onMouseEnter={e => (e.currentTarget.style.background = '#1e40af')}
-          onMouseLeave={e => (e.currentTarget.style.background = '#1d4ed8')}
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-[9px] bg-stone-900 text-white text-[13px] font-semibold transition-colors hover:bg-[#292524] border-none cursor-pointer"
         >
-          <Plus style={{ width: 14, height: 14 }} />
+          <Plus className="w-3.5 h-3.5" />
           Novo Lançamento
         </button>
       </div>
 
       {/* ── Hero: Project Donut Grid ── */}
       {projectsWithStats.length > 0 ? (
-        <div style={{
-          background: '#fff',
-          borderRadius: 14,
-          padding: '20px 22px 22px',
-          boxShadow: '0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.05)',
-        }}>
+        <div className="glass p-5">
           {/* Section header */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
-            <div style={{
-              width: 30, height: 30, borderRadius: 8,
-              background: 'rgba(181,97,74,0.10)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <PieChart style={{ width: 15, height: 15, color: '#B5614A' }} />
+          <div className="flex items-center gap-2.5 mb-[18px]">
+            <div className="w-[30px] h-[30px] rounded-lg bg-terra-subtle flex items-center justify-center">
+              <PieChart className="w-[15px] h-[15px] text-[#B5614A]" />
             </div>
             <div>
-              <h2 style={{ fontSize: 14, fontWeight: 700, color: '#0A0A0B', margin: 0, letterSpacing: '-0.01em' }}>
+              <h2 className="text-section-title">
                 Projetos ativos
               </h2>
-              <p style={{ fontSize: 11, color: 'rgba(10,10,11,0.40)', margin: '2px 0 0' }}>
+              <p className="text-[11px] text-stone-900/40 mt-0.5 m-0">
                 Clique em um projeto para ver detalhes completos
               </p>
             </div>
-            <div style={{ marginLeft: 'auto' }}>
-              <span style={{
-                fontSize: 10, fontWeight: 700, color: 'rgba(10,10,11,0.38)',
-                padding: '3px 8px', background: 'rgba(10,10,11,0.04)', borderRadius: 999,
-                letterSpacing: '0.06em', textTransform: 'uppercase',
-              }}>
+            <div className="ml-auto">
+              <span className="text-[10px] font-bold text-stone-900/[0.38] px-2 py-[3px] bg-stone-900/[0.04] rounded-full tracking-wider uppercase">
                 {projectsWithStats.length} projeto{projectsWithStats.length !== 1 ? 's' : ''}
               </span>
             </div>
           </div>
 
           {/* Donut grid */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))',
-            gap: 12,
-          }}>
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(170px,1fr))] gap-3">
             {projectsWithStats.map((project) => (
               <ProjectDonutCard
                 key={project.id}
@@ -375,15 +304,9 @@ export function OverviewClient({ entries, projectsWithStats }: Props) {
           </div>
         </div>
       ) : (
-        <div style={{
-          background: '#fff',
-          borderRadius: 14,
-          padding: '40px 22px',
-          boxShadow: '0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.05)',
-          textAlign: 'center',
-        }}>
-          <PieChart style={{ width: 32, height: 32, color: '#e2e8f0', margin: '0 auto 10px' }} />
-          <p style={{ fontSize: 13, color: 'rgba(10,10,11,0.32)' }}>Nenhum projeto ativo encontrado.</p>
+        <div className="glass p-10 text-center">
+          <PieChart className="w-8 h-8 text-stone-300 mx-auto mb-2.5" />
+          <p className="text-[13px] text-stone-900/[0.32]">Nenhum projeto ativo encontrado.</p>
         </div>
       )}
 
@@ -400,11 +323,6 @@ export function OverviewClient({ entries, projectsWithStats }: Props) {
         loading={isPending && activeProjectId !== null}
         onClose={handlePanelClose}
       />
-
-      {/* Spin keyframe for loading state */}
-      <style>{`
-        @keyframes spin { to { transform: rotate(360deg); } }
-      `}</style>
     </>
   )
 }
