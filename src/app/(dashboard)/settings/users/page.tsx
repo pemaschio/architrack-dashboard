@@ -14,8 +14,8 @@ export default async function SettingsUsersPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Usuários</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-page-title">Usuários</h1>
+          <p className="text-sm text-stone-400 mt-1">
             Gerencie os membros da equipe e seus perfis de acesso.
           </p>
         </div>
@@ -24,9 +24,9 @@ export default async function SettingsUsersPage() {
 
       <UsersTable users={users || []} />
 
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-700">
-        <strong>Onboarding via WhatsApp:</strong> Pré-cadastre o usuário aqui com{' '}
-        <code className="bg-blue-100 px-1 rounded">is_active = false</code>. O WF-06 ativa
+      <div className="glass p-4 text-sm text-stone-500">
+        <strong className="font-semibold text-stone-900">Onboarding via WhatsApp:</strong> Pré-cadastre o usuário aqui com{' '}
+        <code className="bg-stone-300/15 px-1 rounded">is_active = false</code>. O WF-06 ativa
         automaticamente quando o número enviar a primeira mensagem.
       </div>
     </div>

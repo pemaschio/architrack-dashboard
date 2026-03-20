@@ -38,7 +38,7 @@ export function AddProjectDialog({ phases }: Props) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors"
+        className="inline-flex items-center gap-2 px-4 py-2 bg-stone-900 text-white text-sm font-medium rounded-lg hover:bg-[#292524] transition-colors"
       >
         + Novo Projeto
       </button>
@@ -46,45 +46,45 @@ export function AddProjectDialog({ phases }: Props) {
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div
-            className="absolute inset-0 bg-black/40"
+            className="absolute inset-0 glass-backdrop"
             onClick={() => !isPending && setOpen(false)}
           />
-          <div className="relative bg-white rounded-xl shadow-xl p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
-            <h2 className="text-lg font-semibold text-gray-900 mb-1">Novo Projeto</h2>
-            <p className="text-sm text-gray-500 mb-5">
+          <div className="relative glass-modal p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+            <h2 className="text-lg font-semibold text-stone-900 mb-1">Novo Projeto</h2>
+            <p className="text-sm text-stone-400 mb-5">
               Preencha os dados do projeto. Campos marcados com{' '}
               <span className="text-red-500">*</span> são obrigatórios.
             </p>
 
             <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-stone-500 mb-1">
                   Nome do projeto <span className="text-red-500">*</span>
                 </label>
                 <input
                   name="name"
                   required
                   placeholder="Residência Silva"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+                  className="w-full px-3 py-2 text-sm rounded-lg glass-input"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Cliente</label>
+                <label className="block text-sm font-medium text-stone-500 mb-1">Cliente</label>
                 <input
                   name="client_name"
                   placeholder="João Silva"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+                  className="w-full px-3 py-2 text-sm rounded-lg glass-input"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <label className="block text-sm font-medium text-stone-500 mb-1">Status</label>
                   <select
                     name="status"
                     defaultValue="active"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 bg-white"
+                    className="w-full px-3 py-2 text-sm rounded-lg glass-input"
                   >
                     <option value="active">Ativo</option>
                     <option value="paused">Pausado</option>
@@ -94,10 +94,10 @@ export function AddProjectDialog({ phases }: Props) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Etapa</label>
+                  <label className="block text-sm font-medium text-stone-500 mb-1">Etapa</label>
                   <select
                     name="phase_id"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 bg-white"
+                    className="w-full px-3 py-2 text-sm rounded-lg glass-input"
                   >
                     <option value="">— Sem etapa —</option>
                     {phases.map((p) => (
@@ -111,7 +111,7 @@ export function AddProjectDialog({ phases }: Props) {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-stone-500 mb-1">
                     Orçado (horas)
                   </label>
                   <input
@@ -120,12 +120,12 @@ export function AddProjectDialog({ phases }: Props) {
                     step="1"
                     min="0"
                     placeholder="120"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+                    className="w-full px-3 py-2 text-sm rounded-lg glass-input"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-stone-500 mb-1">
                     Orçado (R$)
                   </label>
                   <input
@@ -134,35 +134,35 @@ export function AddProjectDialog({ phases }: Props) {
                     step="0.01"
                     min="0"
                     placeholder="50000,00"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+                    className="w-full px-3 py-2 text-sm rounded-lg glass-input"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-stone-500 mb-1">
                     Data de início
                   </label>
                   <input
                     name="start_date"
                     type="date"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+                    className="w-full px-3 py-2 text-sm rounded-lg glass-input"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Prazo</label>
+                  <label className="block text-sm font-medium text-stone-500 mb-1">Prazo</label>
                   <input
                     name="deadline"
                     type="date"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+                    className="w-full px-3 py-2 text-sm rounded-lg glass-input"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-stone-500 mb-1">
                   Alerta de horas (%)
                 </label>
                 <input
@@ -171,15 +171,15 @@ export function AddProjectDialog({ phases }: Props) {
                   min="0"
                   max="100"
                   defaultValue="80"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+                  className="w-full px-3 py-2 text-sm rounded-lg glass-input"
                 />
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-stone-400 mt-1">
                   Alerta será disparado quando % das horas orçadas for atingida
                 </p>
               </div>
 
               {error && (
-                <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                <p className="text-sm text-red-600 bg-red-500/[0.08] border border-red-200 rounded-lg px-3 py-2">
                   {error}
                 </p>
               )}
@@ -189,14 +189,14 @@ export function AddProjectDialog({ phases }: Props) {
                   type="button"
                   onClick={() => setOpen(false)}
                   disabled={isPending}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+                  className="px-4 py-2 text-sm font-medium text-stone-500 hover:bg-stone-300/15 rounded-lg transition-colors disabled:opacity-50"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={isPending}
-                  className="px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50"
+                  className="px-4 py-2 text-sm font-medium text-white bg-stone-900 rounded-lg hover:bg-[#292524] transition-colors disabled:opacity-50"
                 >
                   {isPending ? 'Salvando...' : 'Salvar'}
                 </button>

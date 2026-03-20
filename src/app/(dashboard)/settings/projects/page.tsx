@@ -27,8 +27,8 @@ export default async function SettingsProjectsPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Projetos</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-page-title">Projetos</h1>
+          <p className="text-sm text-stone-400 mt-1">
             Cadastre e edite os projetos da organização.
           </p>
         </div>
