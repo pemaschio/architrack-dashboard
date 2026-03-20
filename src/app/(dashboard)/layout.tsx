@@ -15,9 +15,9 @@ export default async function DashboardLayout({
   if (!user) redirect('/login')
 
   return (
-    <div className="flex h-screen" style={{ background: '#F4F2EF' }}>
+    <div className="flex h-screen bg-[#EAEAE5]">
       <Sidebar />
-      <main className="flex-1 overflow-auto" style={{ padding: '32px 32px' }}>
+      <main className="flex-1 overflow-auto p-8">
         {children}
       </main>
     </div>
